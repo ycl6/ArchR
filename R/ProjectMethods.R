@@ -883,10 +883,11 @@ getExons <- function(ArchRProj = NULL, symbols = NULL){
 #' @param returnMatrix If set to "mat" or "matrix", the function will return the `reducedDims` object as a matrix with entries for
 #' each individual cell. Otherwise, it will return the full `reducedDims` object.
 #' @param dimsToUse A vector containing the dimensions (i.e. 1:30) to return from the `reducedDims` object.
-#' @param scaleDims A boolean describing whether to z-score the reduced dimensions for each cell. This is useful for minimizing the
-#' contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-#' biases since it is over-weighting latent PCs. If `NULL` this will scale the dimensions depending on if this were set true when the
-#' `reducedDims` were created by the dimensionality reduction method. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions 
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation
 #' to sequencing depth that is greater than the `corCutOff`, it will be excluded.
 #' 
@@ -905,6 +906,7 @@ getReducedDims <- function(
   returnMatrix = TRUE, 
   dimsToUse = NULL,
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75
   ){
 
@@ -914,6 +916,7 @@ getReducedDims <- function(
   .validInput(input = returnMatrix, name = "returnMatrix", valid = "boolean")
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("integer", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean", "null"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   #########
 
@@ -929,16 +932,18 @@ getReducedDims <- function(
     
     if(is.na(ArchRProj@reducedDims[[reducedDims]]$scaleDims[1])){
       scaleDims <- FALSE # if na this means dont scaleDims ever.
+      scaleBy <- "row" # set to default
     }
 
     if(is.null(scaleDims)){
       scaleDims <- ArchRProj@reducedDims[[reducedDims]]$scaleDims
+      scaleBy <- ArchRProj@reducedDims[[reducedDims]]$scaleBy
     }
 
     #Get Dimensions
     if(scaleDims){
       corToDepth <- ArchRProj@reducedDims[[reducedDims]]$corToDepth$scaled
-      matDR <- .scaleDims(ArchRProj@reducedDims[[reducedDims]][[1]])
+      matDR <- .scaleDims(ArchRProj@reducedDims[[reducedDims]][[1]], scale = scaleBy)
     }else{
       if(is.na(ArchRProj@reducedDims[[reducedDims]]$corToDepth[1])){
         corToDepth <- rep(0, ncol(ArchRProj@reducedDims[[reducedDims]][[1]]))
@@ -986,11 +991,19 @@ getReducedDims <- function(
 
 }
 
-.scaleDims <- function(x, scaleMax = NULL){
+.scaleDims <- function(x, scale = "row", scaleMax = NULL){
   if(!is.null(scaleMax)){
-    .rowZscores(m=x, min=-scaleMax, max = scaleMax, limit = TRUE)
+    if(scale == "column") {
+      .colZscores(m=x, min=-scaleMax, max = scaleMax, limit = TRUE)
+    } else {
+      .rowZscores(m=x, min=-scaleMax, max = scaleMax, limit = TRUE)
+    }
   }else{
-    .rowZscores(m=x)
+    if(scale == "column") {
+      .colZscores(m=x)
+    } else {
+      .rowZscores(m=x)
+    }
   }
 }
 

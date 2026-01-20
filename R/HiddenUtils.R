@@ -99,8 +99,20 @@
   knnIdx
 }
 
+# Performs row-wise (cell) scaling of the singular value decomposition (SVD) matrix, matSVD
 .rowZscores <- function(m = NULL, min = -2, max = 2, limit = FALSE){
   z <- sweep(m - rowMeans(m), 1, matrixStats::rowSds(m),`/`)
+  if(limit){
+    z[z > max] <- max
+    z[z < min] <- min
+  }
+  return(z)
+}
+
+# Performs column-wise (component) scaling of the singular value decomposition (SVD) matrix, matSVD
+# see https://github.com/GreenleafLab/ArchR/issues/2120
+.colZscores <- function(m = NULL, min = -2, max = 2, limit = FALSE){
+  z <- sweep(t(t(m) - colMeans(m)), 2, matrixStats::colSds(m), `/`)
   if(limit){
     z[z > max] <- max
     z[z < min] <- min

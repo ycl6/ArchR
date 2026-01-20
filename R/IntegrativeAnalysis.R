@@ -19,10 +19,11 @@
 #' @param log2Norm2 A boolean describing whether to log2 normalize matrix 2.
 #' @param reducedDims The name of the `reducedDims` object (i.e. "IterativeLSI") to use from the designated `ArchRProject`.
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` object to use in computing the embedding.
-#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions for each cell. This is useful for minimizing
-#' the contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-#' biases since it is over-weighting latent PCs. If set to `NULL` this will scale the dimensions based on the value of `scaleDims` when the
-#' `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation to
 #' sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param k The number of k-nearest neighbors to use for creating single-cell groups for correlation analyses.
@@ -63,6 +64,7 @@ correlateMatrices <- function(
   reducedDims = "IterativeLSI",
   dimsToUse = 1:30,
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75,
   k = 100, 
   knnIteration = 500, 
@@ -85,6 +87,7 @@ correlateMatrices <- function(
   .validInput(input = reducedDims, name = "reducedDims", valid = c("character"))
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("integer", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean", "null"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   .validInput(input = k, name = "k", valid = c("integer"))
   .validInput(input = knnIteration, name = "knnIteration", valid = c("integer"))
@@ -693,10 +696,11 @@ correlateTrajectories <- function(
 #' @param ArchRProj An `ArchRProject` object.
 #' @param reducedDims The name of the `reducedDims` object (i.e. "IterativeLSI") to retrieve from the designated `ArchRProject`.
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` object to use in clustering.
-#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions for each cell. This is useful for minimizing
-#' the contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-#' biases since it is over-weighting latent PCs. If set to `NULL` this will scale the dimensions based on the value of `scaleDims` when the
-#' `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation to
 #' sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param cellsToUse A character vector of cellNames to compute coAccessibility on if desired to run on a subset of the total cells.
@@ -729,6 +733,7 @@ addCoAccessibility <- function(
   reducedDims = "IterativeLSI",
   dimsToUse = 1:30,
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75,
   cellsToUse = NULL,
   excludeChr = NULL,
@@ -748,6 +753,7 @@ addCoAccessibility <- function(
   .validInput(input = reducedDims, name = "reducedDims", valid = c("character"))
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("numeric", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean", "null"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   .validInput(input = cellsToUse, name = "cellsToUse", valid = c("character", "null"))
   .validInput(input = excludeChr, name = "excludeChr", valid = c("character", "null"))
@@ -1012,10 +1018,11 @@ getCoAccessibility <- function(
 #' @param reducedDims The name of the `reducedDims` object (i.e. "IterativeLSI") to retrieve from the designated `ArchRProject`.
 #' @param useMatrix The name of the matrix containing gene expression information to be used for determining peak-to-gene links. See `getAvailableMatrices(ArchRProj)`
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` object to use in clustering.
-#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions for each cell. This is useful for minimizing
-#' the contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-#' biases since it is over-weighting latent PCs. If set to `NULL` this will scale the dimensions based on the value of `scaleDims` when the
-#' `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a
 #' correlation to sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param cellsToUse A character vector of cellNames to compute peak-to-gene links on if desired to run on a subset of the total cells.
@@ -1057,6 +1064,7 @@ addPeak2GeneLinks <- function(
   useMatrix = "GeneIntegrationMatrix",
   dimsToUse = 1:30,
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75,
   cellsToUse = NULL,
   excludeChr = NULL,
@@ -1081,6 +1089,7 @@ addPeak2GeneLinks <- function(
   .validInput(input = useMatrix, name = "useMatrix", valid = c("character"))
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("numeric", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean", "null"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   .validInput(input = cellsToUse, name = "cellsToUse", valid = c("character", "null"))
   .validInput(input = excludeChr, name = "excludeChr", valid = c("character", "null"))
