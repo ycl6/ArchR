@@ -24,9 +24,11 @@
 #' it could impact downstream functionalities including increasing the time required to run `addClusters()`.
 #' @param LSIMethod A number or string indicating the order of operations in the TF-IDF normalization.
 #' Possible values are: 1 or "tf-logidf", 2 or "log(tf-idf)", and 3 or "logtf-logidf".
-#' @param scaleDims A boolean that indicates whether to z-score the reduced dimensions for each cell. This is useful forminimizing the contribution
-#' of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific biases since
-#' it is over-weighting latent PCs.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is to perform scaling on the SVD matrix.
+#' You can use `scaleDims = FALSE` to turn off scaling.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation to
 #' sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param binarize A boolean value indicating whether the matrix should be binarized before running LSI. This is often desired when working with insertion counts.
@@ -90,6 +92,7 @@ addIterativeLSI <- function(
   dimsToUse = 1:30,
   LSIMethod = 2,
   scaleDims = TRUE,
+  scaleBy = "row",
   corCutOff = 0.75,
   binarize = TRUE,
   outlierQuantiles = c(0.02, 0.98),
@@ -130,6 +133,7 @@ addIterativeLSI <- function(
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("integer"))
   .validInput(input = LSIMethod, name = "LSIMethod", valid = c("integer", "character"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric"))
   .validInput(input = binarize, name = "binarize", valid = c("boolean"))
   .validInput(input = outlierQuantiles, name = "outlierQuantiles", valid = c("numeric", "null"))
@@ -152,6 +156,7 @@ addIterativeLSI <- function(
   .validInput(input = force, name = "force", valid = c("boolean"))
   .validInput(input = logFile, name = "logFile", valid = c("character"))
 
+  if(scaleBy != "column") scaleBy <- "row" # default to row-wise scaling
 
   if(varFeatures < 1000){
     stop("Please provide more than 1000 varFeatures!")
@@ -360,6 +365,7 @@ addIterativeLSI <- function(
     useMatrix = useMatrix,
     sampleNames = getCellColData(ArchRProj)$Sample, 
     LSIMethod = LSIMethod, 
+    scaleBy = scaleBy,
     scaleTo = scaleTo,
     dimsToUse = dimsToUse, 
     binarize = binarize, 
@@ -375,6 +381,7 @@ addIterativeLSI <- function(
     logFile = logFile
   )
   outLSI$scaleDims <- scaleDims
+  outLSI$scaleBy <- scaleBy
   outLSI$useMatrix <- useMatrix
   outLSI$tileSize <- tileSize
   gc()
@@ -397,6 +404,7 @@ addIterativeLSI <- function(
     cellDepth = cellDepth,
     dimsToUse = dimsToUse,
     scaleDims = scaleDims,
+    scaleBy = scaleBy,
     corCutOff = corCutOff,
     clusterParams = clusterParams,
     j = j,
@@ -414,7 +422,7 @@ addIterativeLSI <- function(
   #########################
   if(saveIterations){
     .logDiffTime("Saving LSI Iteration", tstart, addHeader = FALSE, verbose = verbose, logFile = logFile)
-    .saveIteration(outLSI=outLSI, clusters=clusters, scaleDims = scaleDims, 
+    .saveIteration(outLSI=outLSI, clusters=clusters, scaleDims = scaleDims, scaleBy = scaleBy,
       dimsToUse = dimsToUse, corCutOff = corCutOff, outDir = outDir,
       nPlot=nPlot, UMAPParams=UMAPParams, ArchRProj=ArchRProj, j = j, threads = threads, logFile = logFile)
   }
@@ -475,6 +483,7 @@ addIterativeLSI <- function(
       cellDepth = cellDepth,
       sampleNames = getCellColData(ArchRProj)$Sample, 
       LSIMethod = LSIMethod, 
+      scaleBy = scaleBy,
       scaleTo = scaleTo, 
       dimsToUse = dimsToUse,
       binarize = binarize,
@@ -490,6 +499,7 @@ addIterativeLSI <- function(
       logFile = logFile
     )
     outLSI$scaleDims <- scaleDims
+    outLSI$scaleBy <- scaleBy
     outLSI$useMatrix <- useMatrix
     outLSI$tileSize <- tileSize
     .logThis(outLSI, paste0("outLSI-",j), logFile = logFile)
@@ -503,6 +513,7 @@ addIterativeLSI <- function(
         outLSI = outLSI,
         dimsToUse = dimsToUse,
         scaleDims = scaleDims,
+	scaleBy = scaleBy,
         corCutOff = corCutOff,
         filterBias = filterBias,
         cellNames = cellNames,
@@ -523,7 +534,7 @@ addIterativeLSI <- function(
       #########################
       if(saveIterations){
         .logDiffTime("Saving LSI Iteration", tstart, addHeader = FALSE, verbose = verbose, logFile = logFile)
-        .saveIteration(outLSI=outLSI, clusters=clusters, scaleDims = scaleDims, 
+        .saveIteration(outLSI=outLSI, clusters=clusters, scaleDims = scaleDims, scaleBy = scaleBy,
           dimsToUse = dimsToUse, corCutOff = corCutOff, outDir = outDir,
           nPlot=nPlot, UMAPParams=UMAPParams, ArchRProj=ArchRProj, j = j, threads = threads, logFile = logFile)
       }
@@ -557,6 +568,7 @@ addIterativeLSI <- function(
   outlierQuantiles = c(0.02, 0.98),
   keep0lsi = FALSE,
   LSIMethod = FALSE,
+  scaleBy = NULL,
   scaleTo = 10^4,
   sampleCells = 5000, 
   projectAll = TRUE,
@@ -609,7 +621,7 @@ addIterativeLSI <- function(
       )
       outLSI$LSIFeatures <- featureDF
       outLSI$corToDepth <- list(
-        scaled = abs(cor(.scaleDims(outLSI[[1]]), cellDepth[rownames(outLSI[[1]])]))[,1],
+        scaled = abs(cor(.scaleDims(outLSI[[1]], scale = scaleBy), cellDepth[rownames(outLSI[[1]])]))[,1],
         none = abs(cor(outLSI[[1]], cellDepth[rownames(outLSI[[1]])]))[,1]
       )
 
@@ -657,7 +669,7 @@ addIterativeLSI <- function(
         )
         outLSI$LSIFeatures <- featureDF
         outLSI$corToDepth <- list(
-          scaled = abs(cor(.scaleDims(outLSI[[1]]), cellDepth[rownames(outLSI[[1]])]))[,1],
+          scaled = abs(cor(.scaleDims(outLSI[[1]], scale = scaleBy), cellDepth[rownames(outLSI[[1]])]))[,1],
           none = abs(cor(outLSI[[1]], cellDepth[rownames(outLSI[[1]])]))[,1]
         )
 
@@ -720,7 +732,7 @@ addIterativeLSI <- function(
 
       outLSI$LSIFeatures <- featureDF
       outLSI$corToDepth <- list(
-        scaled = abs(cor(.scaleDims(outLSI[[1]]), cellDepth[rownames(outLSI[[1]])]))[,1],
+        scaled = abs(cor(.scaleDims(outLSI[[1]], scale = scaleBy), cellDepth[rownames(outLSI[[1]])]))[,1],
         none = abs(cor(outLSI[[1]], cellDepth[rownames(outLSI[[1]])]))[,1]
       )
 
@@ -813,6 +825,7 @@ addIterativeLSI <- function(
   UMAPParams = NULL, 
   ArchRProj = NULL, 
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = NULL,
   dimsToUse = NULL,
   j = NULL,
@@ -844,7 +857,7 @@ addIterativeLSI <- function(
       #Plot Quick UMAP
       UMAPParams <- .mergeParams(UMAPParams, list(n_neighbors = 40, min_dist = 0.4, metric="cosine", verbose=FALSE, fast_sgd = TRUE))
       if(scaleDims){
-        UMAPParams$X <- .scaleDims((outLSI[[1]][saveIdx,,drop=FALSE])[, dimsPF, drop = FALSE])
+        UMAPParams$X <- .scaleDims((outLSI[[1]][saveIdx,,drop=FALSE])[, dimsPF, drop = FALSE], scale = scaleBy)
       }else{
         UMAPParams$X <- (outLSI[[1]][saveIdx,,drop=FALSE])[, dimsPF, drop = FALSE]
       }
@@ -909,6 +922,7 @@ addIterativeLSI <- function(
   corCutOff = NULL,
   dimsToUse = NULL, 
   scaleDims = NULL, 
+  scaleBy = NULL,
   clusterParams = NULL,
   verbose = NULL,
   j = NULL,
@@ -947,7 +961,7 @@ addIterativeLSI <- function(
     })
     parClust$verbose <- FALSE
     if(scaleDims){
-      parClust$input <- .scaleDims(outLSI$matSVD)[, dimsPF, drop = FALSE]
+      parClust$input <- .scaleDims(outLSI$matSVD, scale = scaleBy)[, dimsPF, drop = FALSE]
     }else{
       parClust$input <- outLSI$matSVD[, dimsPF, drop = FALSE]
     }

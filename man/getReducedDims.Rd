@@ -10,6 +10,7 @@ getReducedDims(
   returnMatrix = TRUE,
   dimsToUse = NULL,
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75
 )
 }
@@ -23,10 +24,12 @@ each individual cell. Otherwise, it will return the full \code{reducedDims} obje
 
 \item{dimsToUse}{A vector containing the dimensions (i.e. 1:30) to return from the \code{reducedDims} object.}
 
-\item{scaleDims}{A boolean describing whether to z-score the reduced dimensions for each cell. This is useful for minimizing the
-contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-biases since it is over-weighting latent PCs. If \code{NULL} this will scale the dimensions depending on if this were set true when the
-\code{reducedDims} were created by the dimensionality reduction method. This idea was introduced by Timothy Stuart.}
+\item{scaleDims}{A boolean value that indicates whether to z-score the reduced dimensions. The default is set to \code{NULL}, and will scale the dimensions
+based on the value of \code{scaleDims} when the \code{reducedDims} were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.}
+
+\item{scaleBy}{A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when \code{scaleDims = TRUE}.
+In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the \code{signac::RunSVD} implementation.
+You can use \code{scaleBy = "column"} to perform scaling for each component. Like, \code{scaleDims}, the saved value of \code{scaleBy} will be used if set to \code{scaleBy = NULL}.}
 
 \item{corCutOff}{A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation
 to sequencing depth that is greater than the \code{corCutOff}, it will be excluded.}

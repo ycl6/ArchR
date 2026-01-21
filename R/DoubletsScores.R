@@ -15,9 +15,11 @@
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` object to use in clustering.
 #' @param LSIMethod A number or string indicating the order of operations in the TF-IDF normalization.
 #' Possible values are: 1 or "tf-logidf", 2 or "log(tf-idf)", and 3 or "logtf-logidf".
-#' @param scaleDims A boolean that indicates whether to z-score the reduced dimensions for each cell during the LSI
-#' method performed for doublet determination. This is useful for minimizing the contribution of strong biases (dominating early PCs)
-#' and lowly abundant populations. However, this may lead to stronger sample-specific biases since it is over-weighting latent PCs.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions during the LSI method performed for doublet determination. 
+#' The default is to NOT perform scaling on the SVD matrix. You can use `scaleDims = TRUE` to turn ON scaling.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation
 #' to sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param knnMethod The name of the dimensionality reduction method to be used for k-nearest neighbors calculation. Possible values are "UMAP" or "LSI".
@@ -49,6 +51,7 @@ addDoubletScores <- function(
   dimsToUse = 1:30,
   LSIMethod = 1,
   scaleDims = FALSE,
+  scaleBy = "row",
   corCutOff = 0.75,
   knnMethod = "UMAP",
   UMAPParams = list(n_neighbors = 40, min_dist = 0.4, metric = "euclidean", verbose = FALSE),
@@ -68,6 +71,7 @@ addDoubletScores <- function(
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("integer", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("boolean"))
   .validInput(input = knnMethod, name = "knnMethod", valid = c("character"))
   .validInput(input = UMAPParams, name = "UMAPParams", valid = c("list"))
   .validInput(input = LSIParams, name = "LSIParams", valid = c("list"))
@@ -157,6 +161,7 @@ addDoubletScores <- function(
   LSIMethod = 1,
   sampleCells = NULL,
   scaleDims = FALSE,
+  scaleBy = "row",
   k = 10,
   nSample = 1000,
   knnMethod = "UMAP",
@@ -209,6 +214,7 @@ addDoubletScores <- function(
   LSIParams$LSIMethod <- LSIMethod
   LSIParams$dimsToUse <- dimsToUse
   LSIParams$scaleDims <- scaleDims
+  LSIParams$scaleBy <- scaleBy
   LSIParams$corCutOff <- corCutOff
   LSIParams$threads <- subThreads
   LSIParams$verbose <- FALSE
@@ -230,6 +236,7 @@ addDoubletScores <- function(
     corCutOff = corCutOff, 
     dimsToUse = dimsToUse,
     scaleDims = scaleDims,
+    scaleBy = scaleBy,
     returnMatrix = FALSE
   )
   .logThis(LSI, name = paste0(prefix, "LSI Result"), logFile = logFile)
@@ -543,7 +550,7 @@ addDoubletScores <- function(
   gc()
 
   if(LSI$scaleDims){
-    allLSI <- .scaleDims(allLSI)
+    allLSI <- .scaleDims(allLSI, scale = scaleBy)
   }
 
   #Project UMAP
@@ -619,13 +626,13 @@ addDoubletScores <- function(
 
     nSim <- nrow(LSI$matSVD)
     scaleTo <- 10000
-    scaleBy <- scaleTo / nSim
+    scaleRatio <- scaleTo / nSim
 
     #P-Values
     pvalBinomDoub <- lapply(seq_along(countKnn), function(x){
       #Round Prediction
-      countKnnx <- round(countKnn[x] * scaleBy)
-      sumKnnx <- round(sum(countKnn) * scaleBy)
+      countKnnx <- round(countKnn[x] * scaleRatio)
+      sumKnnx <- round(sum(countKnn) * scaleRatio)
       pbinom(countKnnx - 1, sumKnnx, 1 / scaleTo, lower.tail = FALSE)
     }) %>% unlist
 
@@ -657,13 +664,13 @@ addDoubletScores <- function(
 
     nSim <- nrow(LSI$matSVD)
     scaleTo <- 10000
-    scaleBy <- scaleTo / nSim
+    scaleRatio <- scaleTo / nSim
 
     #P-Values
     pvalBinomDoub <- lapply(seq_along(countKnn), function(x){
       #Round Prediction
-      countKnnx <- round(countKnn[x] * scaleBy)
-      sumKnnx <- round(sum(countKnn) * scaleBy)
+      countKnnx <- round(countKnn[x] * scaleRatio)
+      sumKnnx <- round(sum(countKnn) * scaleRatio)
       pbinom(countKnnx - 1, sumKnnx, 1 / scaleTo, lower.tail = FALSE)
     }) %>% unlist
 

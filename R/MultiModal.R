@@ -373,10 +373,11 @@ import10xFeatureMatrix <- function(
 #' @param reducedDims The name of the `reducedDims` objects (i.e. "IterativeLSI") to use from the designated `ArchRProject`.
 #' @param dimWeights A vector of weights to be used to weight each dimensionality reduction when combining.
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` objects to use.
-#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions for each cell. This is useful for minimizing
-#' the contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-#' biases since it is over-weighting latent PCs. If set to `NULL` this will scale the dimensions based on the value of `scaleDims` when the
-#' `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation to
 #' sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @export
@@ -387,6 +388,7 @@ addCombinedDims <- function(
   dimWeights = NULL,
   dimsToUse = NULL, 
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75
   ){
 
@@ -400,6 +402,7 @@ addCombinedDims <- function(
       reducedDims = reducedDims[x],
       dimsToUse = dimsToUse,
       scaleDims = scaleDims,
+      scaleBy = scaleBy,
       corCutOff = corCutOff
     )
     cV <- apply(as.matrix(rD), 2, var) 
@@ -409,7 +412,8 @@ addCombinedDims <- function(
   colnames(combinedDims) <- paste0('LSI',1:length(colnames(combinedDims)))
   ArchRProj@reducedDims[[name]] <- SimpleList(
     matRD = combinedDims, 
-    scaleDims = NA, 
+    scaleDims = NA,  # do not scale dims after
+    scaleBy = "row", # set to default
     corToDepth = list(scaled = rep(0, ncol(combinedDims)), none = rep(0, ncol(combinedDims)))
   )
   ArchRProj

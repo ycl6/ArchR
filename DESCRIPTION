@@ -14,7 +14,7 @@ License: MIT
 LinkingTo: Rcpp, RcppArmadillo
 LazyData: TRUE
 URL: https://www.ArchRProject.com
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Encoding: UTF-8
 Imports:
     BiocGenerics,

@@ -14,10 +14,11 @@
 #' `uwot::umap()`. For more info on this see https://jlmelville.github.io/uwot/abparams.html.
 #' @param metric A number that determines how distance is computed in the `reducedDims` to compute a UMAP. This argument is passed to `metric` in `uwot::umap()`.
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` object to use in computing the embedding.
-#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions for each cell. This is useful for minimizing
-#' the contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-#' biases since it is over-weighting latent PCs. If set to `NULL` this will scale the dimensions based on the value of `scaleDims` when the
-#' `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions 
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation to
 #' sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param sampleCells An integer specifying the number of cells to subsample and perform UMAP Embedding on. The remaining cells
@@ -52,6 +53,7 @@ addUMAP <- function(
   metric = "cosine",
   dimsToUse = NULL,
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75,
   sampleCells = NULL,
   outlierQuantile = 0.9,
@@ -71,6 +73,7 @@ addUMAP <- function(
   .validInput(input = metric, name = "metric", valid = c("character", "null"))
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("integer", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean", "null"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   .validInput(input = sampleCells, name = "sampleCells", valid = c("integer", "null"))
   .validInput(input = outlierQuantile, name = "outlierQuantile", valid = c("numeric"))
@@ -97,7 +100,8 @@ addUMAP <- function(
       reducedDims = reducedDims, 
       dimsToUse = dimsToUse, 
       corCutOff = corCutOff, 
-      scaleDims = scaleDims
+      scaleDims = scaleDims,
+      scaleBy = scaleBy
   )
   embeddingParams$n_neighbors <- nNeighbors
   embeddingParams$min_dist <- minDist
@@ -183,6 +187,7 @@ addUMAP <- function(
         embeddingParams,
         dimsToUse = dimsToUse,
         scaleDims = scaleDims,
+        scaleBy = scaleBy,
         corCutOff = corCutOff,
         nr=nr,
         nc=nc,
@@ -202,6 +207,7 @@ addUMAP <- function(
         embeddingParams,
         dimsToUse = dimsToUse,
         scaleDims = scaleDims,
+        scaleBy = scaleBy,
         corCutOff = corCutOff,
         nr=nr,
         nc=nc,
@@ -347,10 +353,11 @@ addUMAP <- function(
 #' @param maxIterations An integer describing the maximum number of iterations when computing a TSNE. This argument is passed to `max_iter` in `Rtsne::Rtsne()`.
 #' @param learningRate An integer controlling how much the weights are adjusted at each iteration. This argument is passed to `eta` in `Rtsne::Rtsne()`.
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` object to use in computing the embedding.
-#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions for each cell. This is useful for minimizing
-#' the contribution of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific
-#' biases since it is over-weighting latent PCs. If set to `NULL` this will scale the dimensions based on the value of `scaleDims` when the
-#' `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions 
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation to sequencing
 #' depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param verbose A boolean value that indicates whether printing TSNE output.
@@ -380,6 +387,7 @@ addTSNE <- function(
   learningRate = 200,
   dimsToUse = NULL,
   scaleDims = NULL,
+  scaleBy = NULL,
   corCutOff = 0.75,
   saveModel = FALSE,
   verbose = TRUE,
@@ -398,6 +406,7 @@ addTSNE <- function(
   .validInput(input = learningRate, name = "learningRate", valid = c("integer"))
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("integer", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean", "null"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   .validInput(input = verbose, name = "verbose", valid = c("boolean"))
   .validInput(input = seed, name = "seed", valid = c("integer"))
@@ -424,7 +433,8 @@ addTSNE <- function(
       reducedDims = reducedDims, 
       dimsToUse = dimsToUse, 
       corCutOff = corCutOff, 
-      scaleDims = scaleDims
+      scaleDims = scaleDims,
+      scaleBy = scaleBy
   )
 
   if(tolower(method)!="rtsne"){
@@ -441,7 +451,8 @@ addTSNE <- function(
         reducedDims = reducedDims, 
         dimsToUse = dimsToUse, 
         corCutOff = corCutOff, 
-        scaleDims = scaleDims
+        scaleDims = scaleDims,
+        scaleBy = scaleBy
     )
 
     embeddingParams$pca <- FALSE
@@ -464,7 +475,8 @@ addTSNE <- function(
         reducedDims = reducedDims, 
         dimsToUse = dimsToUse, 
         corCutOff = corCutOff, 
-        scaleDims = scaleDims
+        scaleDims = scaleDims,
+        scaleBy = scaleBy
     )
     
     embeddingParams$assay <- NULL

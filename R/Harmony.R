@@ -5,10 +5,11 @@
 #' @param ArchRProj An `ArchRProject` object containing the dimensionality reduction matrix passed by `reducedDims`.
 #' @param reducedDims The name of the `reducedDims` object (i.e. "IterativeLSI") to retrieve from the designated `ArchRProject`.
 #' @param dimsToUse A vector containing the dimensions from the `reducedDims` object to use in clustering.
-#' @param scaleDims A boolean that indicates whether to z-score the reduced dimensions for each cell. This is useful forminimizing the contribution
-#' of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific biases since
-#' it is over-weighting latent PCs. If set to `NULL` this will scale the dimensions based on the value of `scaleDims` when the `reducedDims` were
-#' originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleDims A boolean value that indicates whether to z-score the reduced dimensions. The default is set to `NULL`, and will scale the dimensions 
+#' based on the value of `scaleDims` when the `reducedDims` were originally created during dimensionality reduction. This idea was introduced by Timothy Stuart.
+#' @param scaleBy A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when `scaleDims = TRUE`.
+#' In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the `signac::RunSVD` implementation.
+#' You can use `scaleBy = "column"` to perform scaling for each component. Like, `scaleDims`, the saved value of `scaleBy` will be used if set to `scaleBy = NULL`.
 #' @param corCutOff A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation
 #' to sequencing depth that is greater than the `corCutOff`, it will be excluded from analysis.
 #' @param name The name to store harmony output as a `reducedDims` in the `ArchRProject` object.
@@ -38,6 +39,7 @@ addHarmony <- function(
   reducedDims = "IterativeLSI",
   dimsToUse = NULL,
   scaleDims = NULL, 
+  scaleBy = NULL,
   corCutOff = 0.75,
   name = "Harmony",
   groupBy = "Sample",
@@ -50,6 +52,7 @@ addHarmony <- function(
   .validInput(input = reducedDims, name = "reducedDims", valid = c("character"))
   .validInput(input = dimsToUse, name = "dimsToUse", valid = c("numeric", "null"))
   .validInput(input = scaleDims, name = "scaleDims", valid = c("boolean", "null"))
+  .validInput(input = scaleBy, name = "scaleBy", valid = c("character", "null"))
   .validInput(input = corCutOff, name = "corCutOff", valid = c("numeric", "null"))
   .validInput(input = name, name = "name", valid = c("character"))
   .validInput(input = groupBy, name = "groupBy", valid = c("character"))
@@ -69,6 +72,7 @@ addHarmony <- function(
     reducedDims = reducedDims, 
     dimsToUse = dimsToUse, 
     scaleDims = scaleDims, 
+    scaleBy = scaleBy,
     corCutOff = corCutOff
   )
   harmonyParams$verbose <- verbose
@@ -79,21 +83,17 @@ addHarmony <- function(
   harmonyParams$vars_use <- groupBy
   harmonyParams$plot_convergence <- FALSE
 
-  #Call Harmony
+  # Call Harmony
   harmonyMat <- suppressWarnings(do.call(HarmonyMatrix, harmonyParams))
   harmonyParams$data_mat <- NULL
   ArchRProj@reducedDims[[name]] <- SimpleList(
     matDR = harmonyMat, 
     params = harmonyParams,
     date = Sys.time(),
-    scaleDims = NA, #Do not scale dims after
+    scaleDims = NA,  # do not scale dims after
+    scaleBy = "row", # set to default
     corToDepth = NA
   )
   ArchRProj
-
 }
-
-
-
-
 

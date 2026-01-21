@@ -17,6 +17,7 @@ addIterativeLSI(
   dimsToUse = 1:30,
   LSIMethod = 2,
   scaleDims = TRUE,
+  scaleBy = "row",
   corCutOff = 0.75,
   binarize = TRUE,
   outlierQuantiles = c(0.02, 0.98),
@@ -70,9 +71,12 @@ it could impact downstream functionalities including increasing the time require
 \item{LSIMethod}{A number or string indicating the order of operations in the TF-IDF normalization.
 Possible values are: 1 or "tf-logidf", 2 or "log(tf-idf)", and 3 or "logtf-logidf".}
 
-\item{scaleDims}{A boolean that indicates whether to z-score the reduced dimensions for each cell. This is useful forminimizing the contribution
-of strong biases (dominating early PCs) and lowly abundant populations. However, this may lead to stronger sample-specific biases since
-it is over-weighting latent PCs.}
+\item{scaleDims}{A boolean value that indicates whether to z-score the reduced dimensions. The default is to perform scaling on the SVD matrix.
+You can use \code{scaleDims = FALSE} to turn off scaling.}
+
+\item{scaleBy}{A character string indicating if the reduced dimensions should be scaled in either the row direction (default) or the column direction when \code{scaleDims = TRUE}.
+In the case of SVD matrix, the default is to perform scaling for each cell, rather than on the components as in the \code{signac::RunSVD} implementation.
+You can use \code{scaleBy = "column"} to perform scaling for each component.}
 
 \item{corCutOff}{A numeric cutoff for the correlation of each dimension to the sequencing depth. If the dimension has a correlation to
 sequencing depth that is greater than the \code{corCutOff}, it will be excluded from analysis.}
