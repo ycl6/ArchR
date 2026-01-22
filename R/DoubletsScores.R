@@ -550,7 +550,7 @@ addDoubletScores <- function(
   gc()
 
   if(LSI$scaleDims){
-    allLSI <- .scaleDims(allLSI, scale = scaleBy)
+    allLSI <- .scaleDims(allLSI, scale = LSI$scaleBy)
   }
 
   #Project UMAP
