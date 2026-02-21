@@ -533,9 +533,9 @@ createArrowFiles <- function(
     .logStop(sprintf("Detected 2 or less cells pass filter (Non-Zero median TSS = %s, median Frags = %s) in file!\n       Check inputs such as 'filterFrags' or 'filterTSS' to keep cells! Exiting!", mTSS, mFrag), logFile = logFile)
   }
 
-  .logDiffTime(sprintf("%s CellStats : Number of Cells Pass Filter = %s ", prefix, sum(Metadata$Keep)), t1 = tstart, verbose = verbose, logFile = logFile)
-  .logDiffTime(sprintf("%s CellStats : Median Frags = %s ", prefix, median(Metadata$nFrags[Metadata$Keep==1])), t1 = tstart, verbose = verbose, logFile = logFile)
-  .logDiffTime(sprintf("%s CellStats : Median TSS Enrichment = %s ", prefix, median(Metadata$TSSEnrichment[Metadata$Keep==1])), t1 = tstart, verbose = verbose, logFile = logFile)
+  .logDiffTime(sprintf("%s Cell Stats: Number of Cells Pass Filter = %s", prefix, sum(Metadata$Keep)), t1 = tstart, verbose = verbose, logFile = logFile)
+  .logDiffTime(sprintf("%s Cell Stats: Median Frags = %s", prefix, median(Metadata$nFrags[Metadata$Keep==1])), t1 = tstart, verbose = verbose, logFile = logFile)
+  .logDiffTime(sprintf("%s Cell Stats: Median TSS Enrichment = %s", prefix, median(Metadata$TSSEnrichment[Metadata$Keep==1])), t1 = tstart, verbose = verbose, logFile = logFile)
 
   plot <- tryCatch({
 
@@ -1237,12 +1237,12 @@ createArrowFiles <- function(
 
       if(threads == 1){
         if(x %% 10 == 0){
-          .logDiffTime(sprintf("%s Reading TabixFile %s Percent", prefix, round(100*x/length(tileChromSizes)),3), t1 = tstart, 
+          .logDiffTime(sprintf("%s Reading TabixFile %s%%", prefix, round(100*x/length(tileChromSizes))), t1 = tstart, 
             verbose = verbose,  logFile = logFile)
         }
       }else{
         if(x %% (2 * threads + 1) == 0){
-          .logDiffTime(sprintf("%s Reading TabixFile %s Percent", prefix, round(100*x/length(tileChromSizes)),3), t1 = tstart, 
+          .logDiffTime(sprintf("%s Reading TabixFile %s%%", prefix, round(100*x/length(tileChromSizes))), t1 = tstart, 
                     verbose = verbose, logFile = logFile)
         }
       }
