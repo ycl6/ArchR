@@ -175,9 +175,9 @@ createLogFile <- function(
     timeStamp <- tryCatch({
       dt <- abs(round(difftime(t2, t1, units = units),precision))
       if(addHeader){
-        msg <- sprintf("%s\n%s : %s, %s %s %s\n%s", header, Sys.time(), main, dt, units, tail, header)
+        msg <- sprintf("%s\n%s : %s, %s %s %s\n%s", header, format(Sys.time(), usetz = TRUE), main, dt, units, tail, header)
       }else{
-        msg <- sprintf("%s : %s, %s %s %s", Sys.time(), main, dt, units, tail)
+        msg <- sprintf("%s : %s, %s %s %s", format(Sys.time(), usetz = TRUE), main, dt, units, tail)
       }
       if(getArchRVerbose()) message(msg)
     }, error = function(x){
@@ -195,9 +195,9 @@ createLogFile <- function(
       logStamp <- tryCatch({
         dt <- abs(round(difftime(t2, t1, units = units),precision))
         if(addHeader){
-          msg <- sprintf("%s\n%s : %s, %s %s %s\n%s", header, Sys.time(), main, dt, units, tail, header)
+          msg <- sprintf("%s\n%s : %s, %s %s %s\n%s", header, format(Sys.time(), usetz = TRUE), main, dt, units, tail, header)
         }else{
-          msg <- sprintf("%s : %s, %s %s %s", Sys.time(), main, dt, units, tail)
+          msg <- sprintf("%s : %s, %s %s %s", format(Sys.time(), usetz = TRUE), main, dt, units, tail)
         }
         cat(paste0(msg,"\n"), file = logFile, append = TRUE)
       }, error = function(x){
@@ -244,7 +244,7 @@ createLogFile <- function(
   #Begin With
   cat(.ArchRLogo(ascii = "Package", messageLogo = FALSE), file = logFile, append = FALSE) 
   cat("\nLogging With ArchR!\n\n", file = logFile, append = TRUE) 
-  cat(paste0("Start Time : ",Sys.time(),"\n\n"), file = logFile, append = TRUE)
+  cat(paste0("Start Time : ", format(Sys.time(), usetz = TRUE), "\n\n"), file = logFile, append = TRUE)
 
   #ArchR Info
   cat("------- ArchR Info\n\n", file = logFile, append = TRUE)
@@ -298,7 +298,7 @@ createLogFile <- function(
   }
 
   if(verbose){
-    message(sprintf("%s : %s", Sys.time(), msg))
+    message(sprintf("%s : %s", format(Sys.time(), usetz = TRUE), msg))
   }
 
   if(!useLogs){
@@ -309,7 +309,7 @@ createLogFile <- function(
     return(invisible(0))
   }
     
-  cat(sprintf("\n%s : %s\n", Sys.time(), msg), file = logFile, append = TRUE)
+  cat(sprintf("\n%s : %s\n", format(Sys.time(), usetz = TRUE), msg), file = logFile, append = TRUE)
 
   return(invisible(0))
 
@@ -334,7 +334,7 @@ createLogFile <- function(
   }
     
   header <- "###########"
-  cat(sprintf("\n%s\n%s : %s\n%s\n\n", header, Sys.time(), name, header), file = logFile, append = TRUE)
+  cat(sprintf("\n%s\n%s : %s\n%s\n\n", header, format(Sys.time(), usetz = TRUE), name, header), file = logFile, append = TRUE)
 
   return(invisible(0))
 }
@@ -354,7 +354,7 @@ createLogFile <- function(
 
   if(useLogs){
     if(!is.null(logFile)){
-      cat(sprintf("\n%s : %s\n", Sys.time(), msg), file = logFile, append = TRUE)
+      cat(sprintf("\n%s : %s\n", format(Sys.time(), usetz = TRUE), msg), file = logFile, append = TRUE)
     }
   }
 
@@ -383,7 +383,7 @@ createLogFile <- function(
 
   if(useLogs){
     #To Log File
-    cat(sprintf("\n%s\n%s : ERROR Found in %s for %s \nLogFile = %s\n\n", header, Sys.time(), fn, info, logFile), file = logFile, append = TRUE)
+    cat(sprintf("\n%s\n%s : ERROR Found in %s for %s \nLogFile = %s\n\n", header, format(Sys.time(), usetz = TRUE), fn, info, logFile), file = logFile, append = TRUE)
 
     utils::capture.output(print(e), file = logFile, append = TRUE)
 
@@ -400,12 +400,12 @@ createLogFile <- function(
   }
   
   #To Console
-  cat(sprintf("\n%s\n%s : ERROR Found in %s for %s \nLogFile = %s\n\n", header, Sys.time(), fn, info, logFile))
+  cat(sprintf("\n%s\n%s : ERROR Found in %s for %s \nLogFile = %s\n\n", header, format(Sys.time(), usetz = TRUE), fn, info, logFile))
   
   if(debug){
     if(!is.null(errorList)){
       debugFile <- paste0(gsub("\\.log", "", logFile), "-debug.rds")
-      cat(sprintf("\n%s : ArchRDebugging is set to TRUE, DebugFile = %s\n", Sys.time(), debugFile))
+      cat(sprintf("\n%s : ArchRDebugging is set to TRUE, DebugFile = %s\n", format(Sys.time(), usetz = TRUE), debugFile))
       .safeSaveRDS(errorList, debugFile)
     }
   }
@@ -442,7 +442,7 @@ createLogFile <- function(
   if(is.null(name)){
     stop("Name must be provided when logging!")
   }
-  cat(paste0("\n", Sys.time(), " : ", name, ", Class = ", class(x), "\n"), file = logFile, append = TRUE)
+  cat(paste0("\n", format(Sys.time(), usetz = TRUE), " : ", name, ", Class = ", class(x), "\n"), file = logFile, append = TRUE)
 
   if(missing(x)){
     cat("Data is Missing\n\n", file = logFile, append = TRUE)
@@ -622,7 +622,7 @@ createLogFile <- function(
     mn <- as.numeric(difftime(Sys.time(), as.POSIXct(t1), units = "mins"))
     hr <- as.numeric(difftime(Sys.time(), as.POSIXct(t1), units = "hours"))
     cat("\n------- Completed\n\n", file = logFile, append = TRUE)
-    cat(paste0("End Time : ",Sys.time(),"\n"), file = logFile, append = TRUE)
+    cat(paste0("End Time : ", format(Sys.time(), usetz = TRUE), "\n"), file = logFile, append = TRUE)
     cat(paste0("Elapsed Time Minutes = ", mn), file = logFile, append = TRUE)
     cat(paste0("\nElapsed Time Hours = ", hr), file = logFile, append = TRUE)
     cat("\n\n-------\n\n\n\n", file = logFile, append = TRUE)
