@@ -493,7 +493,7 @@ createArrowFiles <- function(
       percent = 100 * fragSummary[[2]]/sum(fragSummary[[2]])
     )
     gg <- ggplot(plotDF, aes(x = x, y = percent)) + theme_ArchR(baseSize = 7) + 
-          geom_line(col = "dodgerblue4", size = 0.5) + 
+          geom_line(col = "dodgerblue4", linewidth = 0.5) + 
           coord_cartesian(xlim = c(0,750), ylim = c(0, max(plotDF$percent) * 1.1), expand = FALSE) + 
           xlab("Size of Fragments (bp) \n") + 
           ylab("Fragments (%)") + 
@@ -560,8 +560,8 @@ createArrowFiles <- function(
       ylabel = "TSS Enrichment",
       title = ggtitle,
       rastr = TRUE) + 
-      geom_hline(yintercept=filterTSS, lty = "dashed", size = 0.25) +
-      geom_vline(xintercept=log10(filterFrags), lty = "dashed", size = 0.25)
+      geom_hline(yintercept=filterTSS, lty = "dashed", linewidth = 0.25) +
+      geom_vline(xintercept=log10(filterFrags), lty = "dashed", linewidth = 0.25)
     .fixPlotSize(gg, plotWidth = 4, plotHeight = 4)
     dev.off()
 

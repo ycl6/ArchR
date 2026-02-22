@@ -173,7 +173,7 @@ plotTSSEnrichment <- function(
     }
 
     p <- ggplot(plotDF, aes(x,v,color=group)) +
-      geom_line(size = 1) +
+      geom_line(linewidth = 1) +
       theme_ArchR() +
       xlab("Distance From Center (bp)") +
       ylab("Normalized Insertion Profile") +
@@ -303,7 +303,7 @@ plotFragmentSizes <- function(
     }
 
     p <- ggplot(plotDF, aes(fragmentSize, fragmentPercent,color=group)) + 
-      geom_line(size = 1) +
+      geom_line(linewidth = 1) +
       theme_ArchR() +
       xlab("ATAC-seq Fragment Size (bp)") +
       ylab("Percentage of Fragments") +

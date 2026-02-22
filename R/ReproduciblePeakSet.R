@@ -581,7 +581,7 @@ addReproduciblePeakSet <- function(
     ylab("Number of Peaks (x10^3)") +
     xlab("") + 
     theme(legend.position = "bottom", 
-      legend.key = element_rect(size = 2), 
+      legend.key = element_rect(linewidth = 2), 
       legend.box.background = element_rect(color = NA)
     ) +
     scale_fill_manual(values=pal) +

@@ -365,7 +365,7 @@ ggPoint <- function(
         ggtitle(paste0(title, "\nPearson = ", round(cor(df$x, df$y), 3), "\nSpearman = ", round(cor(df$x, df$y, method = "spearman"), 3)))
   }
 
-  p <- p + theme(legend.position = "bottom", legend.key = element_rect(size = 2))#, legend.spacing.x = unit(0.1, 'cm'), legend.spacing.y = unit(0.1, 'cm'))
+  p <- p + theme(legend.position = "bottom", legend.key = element_rect(linewidth = 2))#, legend.spacing.x = unit(0.1, 'cm'), legend.spacing.y = unit(0.1, 'cm'))
 
   if(!is.null(ratioYX)){
     attr(p, "ratioYX") <- ratioYX
@@ -996,9 +996,9 @@ theme_ArchR <- function(
       panel.background = element_rect(fill = "transparent", colour = NA),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      panel.border = element_rect(fill = NA, color = color, size = (4/3) * baseRectSize * as.numeric(grid::convertX(grid::unit(1, "points"), "mm"))),
+      panel.border = element_rect(fill = NA, color = color, linewidth = (4/3) * baseRectSize * as.numeric(grid::convertX(grid::unit(1, "points"), "mm"))),
       axis.ticks.length = unit(axisTickCm, "cm"), 
-      axis.ticks = element_line(color = color, size = baseLineSize * (4/3) * as.numeric(grid::convertX(grid::unit(1, "points"), "mm"))),
+      axis.ticks = element_line(color = color, linewidth = baseLineSize * (4/3) * as.numeric(grid::convertX(grid::unit(1, "points"), "mm"))),
       legend.key = element_rect(fill = "transparent", colour = NA),
       legend.text = element_text(color = color, size = legendTextSize),
       legend.box.background = element_rect(color = NA),
