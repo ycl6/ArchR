@@ -34,6 +34,7 @@ plotTSSEnrichment <- function(
   ArchRProj = NULL,
   groupBy = "Sample",
   chromSizes = getChromSizes(ArchRProj),
+  excludeChr = NULL,
   TSS = getTSS(ArchRProj),
   flank = 2000, 
   norm = 100, 
@@ -45,6 +46,7 @@ plotTSSEnrichment <- function(
   ){
 
   .validInput(input = ArchRProj, name = "ArchRProj", valid = c("ArchRProj"))
+  .validInput(input = excludeChr, name = "excludeChr", valid = c("character", "null"))
   .validInput(input = TSS, name = "TSS", valid = c("granges"))
   .validInput(input = flank, name = "flank", valid = c("integer"))
   .validInput(input = norm, name = "norm", valid = c("integer"))
@@ -59,6 +61,11 @@ plotTSSEnrichment <- function(
 
   chr <- paste0(seqnames(chromSizes))
   chr <- gtools::mixedsort(intersect(chr, paste0(seqnames(TSS))))
+
+  if(!is.null(excludeChr)){
+    chr <- chr[chr %ni% excludeChr]
+  }
+
   .logThis(chr, paste0("chr"), logFile = logFile)
   TSS <- sort(sortSeqlevels(TSS))
   splitTSS <- split(GenomicRanges::resize(TSS,1,"start"), seqnames(TSS))[chr]
@@ -218,6 +225,7 @@ plotFragmentSizes <- function(
   ArchRProj = NULL,
   groupBy = "Sample",
   chromSizes = getChromSizes(ArchRProj),
+  excludeChr = NULL,
   maxSize = 750,
   pal = NULL,
   returnDF = FALSE,
@@ -226,6 +234,7 @@ plotFragmentSizes <- function(
   ){
 
   .validInput(input = ArchRProj, name = "ArchRProj", valid = c("ArchRProj"))
+  .validInput(input = excludeChr, name = "excludeChr", valid = c("character", "null"))
   .validInput(input = maxSize, name = "maxSize", valid = c("integer"))
   .validInput(input = returnDF, name = "returnDF", valid = c("boolean"))
   .validInput(input = threads, name = "threads", valid = c("integer"))
@@ -236,6 +245,11 @@ plotFragmentSizes <- function(
   .logThis(mget(names(formals()),sys.frame(sys.nframe())), "plotFragmentSizes Input-Parameters", logFile = logFile)
 
   chr <- paste0(seqnames(chromSizes))
+
+  if(!is.null(excludeChr)){
+    chr <- chr[chr %ni% excludeChr]
+  }
+
   groups <- getCellColData(ArchRProj = ArchRProj, select = groupBy, drop = FALSE)
   uniqGroups <- gtools::mixedsort(unique(groups[,1]))
 
