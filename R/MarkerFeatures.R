@@ -818,7 +818,11 @@ getMarkerFeatures <- function(
     estbgd <- sort(floor(minTotal * bgdProbx))
     obsbgd <- rep(0, length(estbgd))
     names(obsbgd) <- names(estbgd)
-    tabGroups <- table(groups[idY])
+    if(is.factor(groups)) {
+      tabGroups <- table(droplevels(groups[idY]))
+    } else {
+      tabGroups <- table(groups[idY])
+    }
     obsbgd[names(tabGroups)] <- tabGroups
     estbgdP <- round(100 * estbgd / sum(estbgd),3)
     obsbgdP <- round(100 * obsbgd / sum(obsbgd),3)
