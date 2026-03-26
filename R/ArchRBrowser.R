@@ -682,7 +682,7 @@ ArchRBrowserTrack <- function(...){
 #' @param plotSummary A character vector containing the features to be potted. Possible values include "bulkTrack" (the ATAC-seq signal),
 #' "scTrack" (scATAC-seq signal), "featureTrack" (i.e. the peak regions), "geneTrack" (line diagrams of genes with introns and exons shown. 
 #' Blue-colored genes are on the minus strand and red-colored genes are on the plus strand), and "loopTrack" (links between a peak and a gene).
-#' @param sizes A numeric vector containing up to 3 values that indicate the sizes of the individual components passed to `plotSummary`.
+#' @param sizes A numeric vector containing up to 5 values that indicate the sizes of the individual components passed to `plotSummary`.
 #' The order must be the same as `plotSummary`.
 #' @param features A `GRanges` (for a single feature track) or `GRangesList` (for multiple feature tracks) object containing the "features" to
 #' be plotted via the "featureTrack". This should be thought of as a bed track. i.e. the set of peaks obtained using `getPeakSet(ArchRProj))`.
@@ -925,6 +925,7 @@ plotBrowserTrack <- function(
         plotList$featuretrack <- .featureTracks(
             features = features, 
             region = region[x], 
+            pal = pal,
 	    baseSize = baseSize,
             facetbaseSize = facetbaseSize,
             hideX = TRUE, 
@@ -1110,12 +1111,12 @@ plotBrowserTrack <- function(
   df$group <- factor(df$group, levels = uniqueGroups)
   title <- paste0(as.character(seqnames(region)),":", start(region)-1, "-", end(region), " ", title)
 
-  allGroups <- gtools::mixedsort(unique(getCellColData(ArchRProj = ArchRProj, select = groupBy, drop = TRUE)))
+  allGroups <- gtools::mixedsort(as.character(unique(getCellColData(ArchRProj = ArchRProj, select = groupBy, drop = TRUE))))
 
   if(is.null(pal)){
     pal <- suppressWarnings(paletteDiscrete(values = allGroups))
   }
-  
+
   #Plot Track
   p <- ggplot(df, aes_string("x","y", color = "group", fill = "group")) + 
     geom_area(stat = "identity") + 
@@ -1599,10 +1600,10 @@ plotBrowserTrack <- function(
     featureO$facet <- title
 
     if(is.null(pal)){
-      pal <- paletteDiscrete(set = "stallion", values = rev(unique(paste0(featureO$name))))
+      pal <- paletteDiscrete(values = gtools::mixedsort(unique(featureO$name), decreasing = TRUE))
     }
-    
-    featureO$name <- factor(paste0(featureO$name), levels=names(featureList))
+
+    featureO$name <- factor(paste0(featureO$name), levels = names(featureList))
 
     p <- ggplot(data = featureO, aes(color = name)) +
       facet_grid(facet~.) +
