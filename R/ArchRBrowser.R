@@ -25,6 +25,7 @@
 #' @param borderWidth The numeric line width to be used for plot borders.
 #' @param tickWidth The numeric line width to be used for axis tick marks.
 #' @param facetbaseSize The numeric font size to be used in the facets (gray boxes used to provide track labels) of the plot.
+#' @param labelSize The numeric font size to be used in the labels in "geneTrack". Default is `4`.
 #' @param geneAnnotation The `geneAnnotation` object to be used for plotting the "geneTrack" object. See `createGeneAnnotation()` for more info.
 #' @param browserTheme A `shinytheme` from shinythemes for viewing the ArchR Browser. If not installed this will be NULL.
 #' To install try devtools::install_github("rstudio/shinythemes").
@@ -49,7 +50,8 @@ ArchRBrowser <- function(
   baseSize = 10,
   borderWidth = 0.5,
   tickWidth = 0.5,
-  facetbaseSize = 12,
+  facetbaseSize = 10,
+  labelSize = 4,
   geneAnnotation = getGeneAnnotation(ArchRProj),
   browserTheme = "cosmo",
   threads = getArchRThreads(),
@@ -423,6 +425,7 @@ ArchRBrowser <- function(
               f <- .featureTracks(
                   features = features, 
                   region = tmpArchRRegion,
+		  baseSize = baseSize,
                   facetbaseSize = facetbaseSize, 
                   hideX = TRUE, 
                   title = "Peaks",
@@ -450,9 +453,10 @@ ArchRBrowser <- function(
 
             g <- .geneTracks(
               geneAnnotation = geneAnnotation, 
-              region = tmpArchRRegion, 
+              region = tmpArchRRegion,
+	      baseSize = baseSize,
               facetbaseSize = facetbaseSize,
-              labelSize = 3,
+	      labelSize = labelSize,
               title = "Genes",
               logFile = logFile
             ) + theme(plot.margin = unit(c(0.1, 0.75, 0.1, 0.75), "cm"))
@@ -570,6 +574,7 @@ ArchRBrowser <- function(
             f <- .featureTracks(
                 features = features, 
                 region = tmpArchRRegion,
+		baseSize = baseSize,
                 facetbaseSize = facetbaseSize, 
                 hideX = TRUE, 
                 title = "Peaks",
@@ -598,8 +603,9 @@ ArchRBrowser <- function(
           g <- .geneTracks(
             geneAnnotation = geneAnnotation, 
             region = tmpArchRRegion, 
+	    baseSize = baseSize,
             facetbaseSize = facetbaseSize,
-            labelSize = 3,
+	    labelSize = labelSize,
             title = "Genes",
             logFile = logFile
           ) + theme(plot.margin = unit(c(0.1, 0.75, 0.1, 0.75), "cm"))
@@ -713,6 +719,7 @@ ArchRBrowserTrack <- function(...){
 #' @param borderWidth The numeric line width to be used for plot borders.
 #' @param tickWidth The numeric line width to be used for axis tick marks.
 #' @param facetbaseSize The numeric font size to be used in the facets (gray boxes used to provide track labels) of the plot.
+#' @param labelSize The numeric font size to be used in the labels in "geneTrack". Default is `4`.
 #' @param geneAnnotation The `geneAnnotation` object to be used for plotting the "geneTrack" object. See `createGeneAnnotation()` for more info.
 #' @param title The title to add at the top of the plot next to the plot's genomic coordinates.
 #' @param verbose A boolean value that determines whether standard output should be printed.
@@ -764,6 +771,7 @@ plotBrowserTrack <- function(
   borderWidth = 0.4,
   tickWidth = 0.4,
   facetbaseSize = 7,
+  labelSize = 4,
   geneAnnotation = getGeneAnnotation(ArchRProj),
   title = "",
   verbose = TRUE,
@@ -917,6 +925,7 @@ plotBrowserTrack <- function(
         plotList$featuretrack <- .featureTracks(
             features = features, 
             region = region[x], 
+	    baseSize = baseSize,
             facetbaseSize = facetbaseSize,
             hideX = TRUE, 
             title = "Peaks",
@@ -953,7 +962,9 @@ plotBrowserTrack <- function(
       plotList$genetrack <- .geneTracks(
         geneAnnotation = geneAnnotation, 
         region = region[x], 
+	baseSize = baseSize,
         facetbaseSize = facetbaseSize,
+	labelSize = labelSize,
         title = "Genes",
         highlight = highlight,
         highlightFill = highlightFill,
@@ -1363,13 +1374,13 @@ plotBrowserTrack <- function(
 .geneTracks <- function(
   geneAnnotation = NULL, 
   region = NULL, 
-  baseSize = 9, 
+  baseSize = 7,
   borderWidth = 0.4, 
   title = "Genes",
   geneWidth = 2, 
   exonWidth = 4, 
-  labelSize = 2,
-  facetbaseSize,
+  labelSize = 4,
+  facetbaseSize = 7,
   colorMinus = "dodgerblue2",
   colorPlus = "red",
   highlight = NULL,
@@ -1525,7 +1536,7 @@ plotBrowserTrack <- function(
   region = NULL, 
   title = "FeatureTrack", 
   pal = NULL,
-  baseSize = 9, 
+  baseSize = NULL,
   facetbaseSize = NULL,
   featureWidth = 2, 
   borderWidth = 0.4, 

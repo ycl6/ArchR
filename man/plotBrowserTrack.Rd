@@ -34,6 +34,7 @@ plotBrowserTrack(
   borderWidth = 0.4,
   tickWidth = 0.4,
   facetbaseSize = 7,
+  labelSize = 4,
   geneAnnotation = getGeneAnnotation(ArchRProj),
   title = "",
   verbose = TRUE,
@@ -122,6 +123,8 @@ or a hex color (i.e. "#bfefff")}
 \item{tickWidth}{The numeric line width to be used for axis tick marks.}
 
 \item{facetbaseSize}{The numeric font size to be used in the facets (gray boxes used to provide track labels) of the plot.}
+
+\item{labelSize}{The numeric font size to be used in the labels in "geneTrack". Default is \code{4}.}
 
 \item{geneAnnotation}{The \code{geneAnnotation} object to be used for plotting the "geneTrack" object. See \code{createGeneAnnotation()} for more info.}
 

@@ -8,6 +8,7 @@ plotFragmentSizes(
   ArchRProj = NULL,
   groupBy = "Sample",
   chromSizes = getChromSizes(ArchRProj),
+  excludeChr = NULL,
   maxSize = 750,
   pal = NULL,
   returnDF = FALSE,

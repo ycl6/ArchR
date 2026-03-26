@@ -8,6 +8,7 @@ plotTSSEnrichment(
   ArchRProj = NULL,
   groupBy = "Sample",
   chromSizes = getChromSizes(ArchRProj),
+  excludeChr = NULL,
   TSS = getTSS(ArchRProj),
   flank = 2000,
   norm = 100,

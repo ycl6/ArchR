@@ -13,7 +13,8 @@ ArchRBrowser(
   baseSize = 10,
   borderWidth = 0.5,
   tickWidth = 0.5,
-  facetbaseSize = 12,
+  facetbaseSize = 10,
+  labelSize = 4,
   geneAnnotation = getGeneAnnotation(ArchRProj),
   browserTheme = "cosmo",
   threads = getArchRThreads(),
@@ -47,6 +48,8 @@ can be used to exclude pseudo-bulk replicates generated from low numbers of cell
 \item{tickWidth}{The numeric line width to be used for axis tick marks.}
 
 \item{facetbaseSize}{The numeric font size to be used in the facets (gray boxes used to provide track labels) of the plot.}
+
+\item{labelSize}{The numeric font size to be used in the labels in "geneTrack". Default is \code{4}.}
 
 \item{geneAnnotation}{The \code{geneAnnotation} object to be used for plotting the "geneTrack" object. See \code{createGeneAnnotation()} for more info.}
 
