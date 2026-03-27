@@ -13,6 +13,7 @@ plotBrowserTrack(
   plotSummary = c("bulkTrack", "featureTrack", "loopTrack", "geneTrack"),
   sizes = c(10, 1.5, 3, 4),
   features = getPeakSet(ArchRProj),
+  featureTrack_lab = NULL,
   loops = getCoAccessibility(ArchRProj),
   geneSymbol = NULL,
   useMatrix = NULL,
@@ -64,13 +65,15 @@ multiplexing applications where cells from different biological samples are mixe
 "scTrack" (scATAC-seq signal), "featureTrack" (i.e. the peak regions), "geneTrack" (line diagrams of genes with introns and exons shown.
 Blue-colored genes are on the minus strand and red-colored genes are on the plus strand), and "loopTrack" (links between a peak and a gene).}
 
-\item{sizes}{A numeric vector containing up to 3 values that indicate the sizes of the individual components passed to \code{plotSummary}.
+\item{sizes}{A numeric vector containing up to 5 values that indicate the sizes of the individual components passed to \code{plotSummary}.
 The order must be the same as \code{plotSummary}.}
 
 \item{features}{A \code{GRanges} (for a single feature track) or \code{GRangesList} (for multiple feature tracks) object containing the "features" to
 be plotted via the "featureTrack". This should be thought of as a bed track. i.e. the set of peaks obtained using \verb{getPeakSet(ArchRProj))}.
 If you provide a \code{GRangesList}, then each element of that object must be named and this name will be used on the plot.
 For example - \code{GRangesList("peaks" = peak_gr, "other" = other_gr)}.}
+
+\item{featureTrack_lab}{A Y-axis title to show at the left of the "featureTrack" panel. Default is \code{NULL}}
 
 \item{loops}{A \code{GRanges} object containing the "loops" to be plotted via the "loopTrack".
 This \code{GRanges} object start represents the center position of one loop anchor and the end represents the center position of another loop anchor.

@@ -688,6 +688,7 @@ ArchRBrowserTrack <- function(...){
 #' be plotted via the "featureTrack". This should be thought of as a bed track. i.e. the set of peaks obtained using `getPeakSet(ArchRProj))`.
 #' If you provide a `GRangesList`, then each element of that object must be named and this name will be used on the plot.
 #' For example - `GRangesList("peaks" = peak_gr, "other" = other_gr)`.
+#' @param featureTrack_lab A Y-axis title to show at the left of the "featureTrack" panel. Default is `NULL`
 #' @param loops A `GRanges` object containing the "loops" to be plotted via the "loopTrack".
 #' This `GRanges` object start represents the center position of one loop anchor and the end represents the center position of another loop anchor. 
 #' A "loopTrack" draws an arc between two genomic regions that show some type of interaction. This type of track can be used 
@@ -750,6 +751,7 @@ plotBrowserTrack <- function(
   plotSummary = c("bulkTrack", "featureTrack", "loopTrack", "geneTrack"),
   sizes = c(10, 1.5, 3, 4),
   features = getPeakSet(ArchRProj),
+  featureTrack_lab = NULL,
   loops = getCoAccessibility(ArchRProj),
   geneSymbol = NULL,
   useMatrix = NULL,
@@ -786,6 +788,7 @@ plotBrowserTrack <- function(
   .validInput(input = plotSummary, name = "plotSummary", valid = "character")
   .validInput(input = sizes, name = "sizes", valid = "numeric")
   .validInput(input = features, name = "features", valid = c("granges", "grangeslist", "null"))
+  .validInput(input = featureTrack_lab, name = "featureTrack_lab", valid = c("character", "null"))
   .validInput(input = loops, name = "loops", valid = c("granges", "grangeslist", "null"))
   .validInput(input = geneSymbol, name = "geneSymbol", valid = c("character", "null"))
   .validInput(input = useMatrix, name = "useMatrix", valid = c("character", "null"))
@@ -924,6 +927,7 @@ plotBrowserTrack <- function(
         .logDiffTime(sprintf("Adding Feature Tracks (%s of %s)",x,length(region)), t1=tstart, verbose=verbose, logFile=logFile)
         plotList$featuretrack <- .featureTracks(
             features = features, 
+	    featureTrack_lab = featureTrack_lab,
             region = region[x], 
             pal = pal,
 	    baseSize = baseSize,
@@ -1534,6 +1538,7 @@ plotBrowserTrack <- function(
 #######################################################
 .featureTracks <- function(
   features = NULL, 
+  featureTrack_lab = NULL,
   region = NULL, 
   title = "FeatureTrack", 
   pal = NULL,
@@ -1606,9 +1611,8 @@ plotBrowserTrack <- function(
     featureO$name <- factor(paste0(featureO$name), levels = names(featureList))
 
     p <- ggplot(data = featureO, aes(color = name)) +
-      facet_grid(facet~.) +
+      facet_grid(facet~.) + xlab("") +
       geom_segment(data = featureO, aes(x = start, xend = end, y = name, yend = name, color = name), size=featureWidth) +
-      ylab("") + xlab("") + 
       scale_x_continuous(limits = c(start(region), end(region)), expand = c(0,0)) +
       scale_color_manual(values = pal) +
       theme(legend.text = element_text(size = baseSize)) + 
@@ -1628,6 +1632,12 @@ plotBrowserTrack <- function(
       theme(axis.title.x=element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank()) +
       theme(axis.title.y=element_blank(), axis.text.y=element_blank(),axis.ticks.y=element_blank())
 
+  }
+
+  if(!is.null(featureTrack_lab)) {
+    p <- p + ylab(featureTrack_lab)
+  } else {
+    p <- p + ylab("")
   }
 
   if(hideX){
