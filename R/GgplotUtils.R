@@ -756,7 +756,7 @@ ggGroup <- function(
       type <- "violin"
       message("ggridges is not available for plotting, continuing with geom_violin!")
       message("To install ggridges try : install.packages('ggridges')")
-      p <- p + geom_violin(aes_string(fill="x"), alpha = alpha)
+      p <- p + geom_violin(aes(fill = x), alpha = alpha)
     }else{
       type <- "ridges"
       .requirePackage("ggridges", source = "cran")
@@ -780,7 +780,7 @@ ggGroup <- function(
     }
   }else{
     type <- "violin"
-    p <- p + geom_violin(aes_string(x = "x", y = "y", color = "x", fill="x"), alpha = alpha)
+    p <- p + geom_violin(aes(x = x, y = y, color = x, fill = x), alpha = alpha)
   }
   
   if(addBoxPlot & type == "violin"){

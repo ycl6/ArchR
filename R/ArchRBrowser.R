@@ -1118,7 +1118,7 @@ plotBrowserTrack <- function(
   }
 
   #Plot Track
-  p <- ggplot(df, aes_string("x","y", color = "group", fill = "group")) + 
+  p <- ggplot(df, aes(x, y, color = group, fill = group)) + 
     geom_area(stat = "identity") + 
     facet_wrap(facets = ~group, strip.position = 'right', ncol = 1) +
     ylab(sprintf("Coverage\n(Norm. ATAC Signal Range (%s-%s) by %s)", round(min(ylim),2), round(max(ylim),2), normMethod)) +
