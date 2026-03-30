@@ -372,7 +372,7 @@
 # Batch Methods
 ##########################################################################################
 
-.safelapply <- function(..., threads = 1, preschedule = FALSE){
+.safelapply <- function(..., threads = 1, preschedule = getArchRLB()){
 
   if(tolower(.Platform$OS.type) == "windows"){
     threads <- 1
@@ -396,22 +396,16 @@
     }
 
     if(length(errorMsg) != 0){
-
       errorMsg <- unlist(errorMsg)
       errorMsg <- head(errorMsg, 50)
       errorMsg[1] <- paste0("\n", errorMsg[1])
       stop(errorMsg)
-
     }
-
   }else{
-
     o <- lapply(...)
-
   }
 
   o
-
 }
 
 .batchlapply <- function(args = NULL, sequential = FALSE){

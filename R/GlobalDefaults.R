@@ -5,6 +5,7 @@
 ########################################################
 ArchRDefaults <- list(
   ArchR.threads = 1,
+  ArchR.preschedule = FALSE, # i.e. mc.preschedule = FALSE
   ArchR.locking = FALSE,
   ArchR.logging = TRUE,
   ArchR.h5level = 0,
@@ -393,6 +394,60 @@ getArchRThreads <- function(){
     }
   }else{
     1
+  }
+}
+
+#' Set the globally-applied load balancing setup
+#'
+#' This function will set the load balancing setup when `mclapply` (parallelised version of lapply) 
+#' is used in ArchR functions.
+#'
+#' @param lb A boolean to set load balancing. If set to `FALSE` then the computation is first divided 
+#' to (at most) as many jobs are there are cores and then the jobs are started (aka prescheduled), 
+#' each job possibly covering more than one value. If set to `TRUE` then one job is forked for each 
+#' value of the input `X`. The former is better for short computations or large number of values in 
+#' the inut `X`, the latter is better for jobs that have high variance of completion time and not too 
+#' many values of the input `X` compared to ArchR Threads. Default is `TRUE`, i.e. with load balancing.
+#'
+#' @examples
+#'
+#' # Disable load balancing (prescheduled)
+#' setArchRLB(lb = FALSE)
+#'
+#' @export
+setArchRLB <- function(lb = TRUE) {
+  .validInput(input = lb, name = "lb", valid = "boolean")
+  preschedule <- !lb
+  if(preschedule) {
+    message("Disable load balancing, set mclapply's preschedule to ", preschedule, ".")
+  } else {
+    message("Enable load balancing, set mclapply's preschedule to ", preschedule, ".")
+  }
+  options(ArchR.preschedule = preschedule)
+}
+
+#' Get the globally-applied load balancing setup
+#'
+#' This function will get the load balancing setup when `mclapply` (parallelised version of lapply) 
+#' is used in ArchR functions.
+#'
+#' @examples
+#'
+#' # Get load balancing setup
+#' getArchRLB()
+#'
+#' @export
+getArchRLB <- function() {
+  preschedule <- options()[["ArchR.preschedule"]]
+  if(!is.null(preschedule)){
+    if(preschedule) {
+      message("Load balancing is disabled.")
+    } else {
+      message("Load balancing is enabled.")
+    }
+    preschedule
+  } else {
+    setArchRLB(lb = TRUE)
   }
 }
 
