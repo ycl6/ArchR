@@ -80,7 +80,7 @@ Cells containing greater than or equal to \code{maxFrags} total fragments will b
 \item{nucLength}{The length in basepairs that wraps around a nucleosome. This number is used for identifying fragments as
 sub-nucleosome-spanning, mono-nucleosome-spanning, or multi-nucleosome-spanning.}
 
-\item{promoterRegion}{A integer vector describing the number of basepairs upstream and downstream \link{c(upstream, downstream)} of the TSS to include
+\item{promoterRegion}{A integer vector describing the number of basepairs upstream and downstream \code{c(upstream, downstream)} of the TSS to include
 as the promoter region for downstream calculation of things like the fraction of reads in promoters (FIP).}
 
 \item{TSSParams}{A list of parameters for computing TSS Enrichment scores. This includes the \code{window} which is the size in basepairs

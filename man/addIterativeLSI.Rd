@@ -108,7 +108,7 @@ variance calculation and TF-IDF normalization.}
 \item{totalFeatures}{The number of features to consider for use in LSI after ranking the features by the total number of insertions.
 These features are the only ones used throught the variance identification and LSI. These are an equivalent when using a \code{TileMatrix} to a defined peakSet.}
 
-\item{filterQuantile}{A number \link{0,1} that indicates the quantile above which features should be removed based on insertion counts prior
+\item{filterQuantile}{A number between 0 and 1 that indicates the quantile above which features should be removed based on insertion counts prior
 to the first iteration of the iterative LSI paradigm. For example, if \code{filterQuantile = 0.99}, any features above the 99th percentile in
 insertion counts will be ignored for the first LSI iteration.}
 

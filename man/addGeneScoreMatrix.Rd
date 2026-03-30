@@ -65,7 +65,7 @@ region with 'geneUpstream' and 'geneDownstream' respectively.}
 
 \item{ceiling}{The maximum counts per tile allowed. This is used to prevent large biases in tile counts.}
 
-\item{geneScaleFactor}{A numeric scaling factor to weight genes based on the inverse of there length i.e. \link{(Scale Factor)/(Gene Length)}. This
+\item{geneScaleFactor}{A numeric scaling factor to weight genes based on the inverse of their lengths, i.e. [(Scale Factor)/(Gene Length)]. This
 is scaled from 1 to the scale factor. Small genes will be the scale factor while extremely large genes will be closer to 1. This scaling helps with
 the relative gene score value.}
 

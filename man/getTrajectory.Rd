@@ -25,8 +25,8 @@ getTrajectory(
 matrices are "GeneScoreMatrix", "PeakMatrix", or "MotifMatrix".}
 
 \item{groupEvery}{The number of sequential percentiles to group together when generating a trajectory. This is similar to smoothing
-via a non-overlapping sliding window across pseudo-time. If \code{groupEvery = 2}, the values for percentiles \link{1 and 2}, \link{3 and 4},
-\link{5 and 6}, etc. will be grouped together.}
+via a non-overlapping sliding window across pseudo-time. If \code{groupEvery = 2}, the values for percentiles [1 and 2], [3 and 4],
+[5 and 6], etc. will be grouped together.}
 
 \item{log2Norm}{A boolean value that indicates whether the summarized trajectory matrix should be log2 transformed. If you are using
 a "MotifMatrix" set to FALSE.}

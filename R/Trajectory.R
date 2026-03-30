@@ -278,8 +278,8 @@ addTrajectory <- function(
 #' @param useMatrix The name of the data matrix from the `ArrowFiles` to get numerical values for each cell from. Recommended
 #' matrices are "GeneScoreMatrix", "PeakMatrix", or "MotifMatrix".
 #' @param groupEvery The number of sequential percentiles to group together when generating a trajectory. This is similar to smoothing
-#' via a non-overlapping sliding window across pseudo-time. If `groupEvery = 2`, the values for percentiles [1 and 2], [3 and 4],
-#' [5 and 6], etc. will be grouped together.
+#' via a non-overlapping sliding window across pseudo-time. If `groupEvery = 2`, the values for percentiles \[1 and 2\], \[3 and 4\],
+#' \[5 and 6\], etc. will be grouped together.
 #' @param log2Norm A boolean value that indicates whether the summarized trajectory matrix should be log2 transformed. If you are using
 #' a "MotifMatrix" set to FALSE.
 #' @param scaleTo Once the sequential trajectory matrix is created, each column in that matrix will be normalized to a column sum

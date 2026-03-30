@@ -28,7 +28,7 @@
 #' region with 'geneUpstream' and 'geneDownstream' respectively.
 #' @param tileSize The size of the tiles used for binning counts prior to gene activity score calculation.
 #' @param ceiling The maximum counts per tile allowed. This is used to prevent large biases in tile counts.
-#' @param geneScaleFactor A numeric scaling factor to weight genes based on the inverse of there length i.e. [(Scale Factor)/(Gene Length)]. This
+#' @param geneScaleFactor A numeric scaling factor to weight genes based on the inverse of their lengths, i.e. \[(Scale Factor)/(Gene Length)\]. This
 #' is scaled from 1 to the scale factor. Small genes will be the scale factor while extremely large genes will be closer to 1. This scaling helps with
 #' the relative gene score value.
 #' @param scaleTo Each column in the calculated gene score matrix will be normalized to a column sum designated by `scaleTo`.

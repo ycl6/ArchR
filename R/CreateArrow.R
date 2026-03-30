@@ -26,7 +26,7 @@
 #' @param QCDir The relative path to the output directory for QC-level information and plots for each sample/ArrowFile.
 #' @param nucLength The length in basepairs that wraps around a nucleosome. This number is used for identifying fragments as
 #' sub-nucleosome-spanning, mono-nucleosome-spanning, or multi-nucleosome-spanning.
-#' @param promoterRegion A integer vector describing the number of basepairs upstream and downstream [c(upstream, downstream)] of the TSS to include 
+#' @param promoterRegion A integer vector describing the number of basepairs upstream and downstream `c(upstream, downstream)` of the TSS to include
 #' as the promoter region for downstream calculation of things like the fraction of reads in promoters (FIP).
 #' @param TSSParams A list of parameters for computing TSS Enrichment scores. This includes the `window` which is the size in basepairs
 #' of the window centered at each TSS (default 101), the `flank` which is the size in basepairs of the flanking window (default 2000), 
