@@ -322,15 +322,8 @@ ggPoint <- function(
             yo <- bgWidth * diff(range(df$y)) / 300
             for (i in theta) {
               p <- p + 
-                geom_text(data = dfMean, 
-                    aes_q(
-                      x = bquote(x + .(cos(i) * xo)),
-                      y = bquote(y + .(sin(i) * yo)),
-                      label = ~text
-                    ),
-                    size = labelSize,
-                    color = bgColor
-                )
+                geom_text(data = dfMean %>% dplyr::mutate(x = x + (cos(i) * xo), y = y + (sin(i) * yo)),
+                    aes(x = x, y = y, label = text), size = labelSize, color = bgColor)
             }
 
             if(is.null(fgColor)){
