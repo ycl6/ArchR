@@ -31,6 +31,7 @@ Imports:
     gtable,
     gtools,
     harmony,
+    lifecycle,
     magrittr,
     Matrix,
     matrixStats,
@@ -49,7 +50,6 @@ Imports:
     stringr,
     SummarizedExperiment,
     uwot
-Depends:
 Suggests:
     Cairo,
     DESeq2,

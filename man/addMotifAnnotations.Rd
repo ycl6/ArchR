@@ -10,7 +10,8 @@ addMotifAnnotations(
   annoName = "Motif",
   species = NULL,
   collection = "CORE",
-  motifPWMs = NULL,
+  motifPWMs = deprecated(),
+  motifList = NULL,
   cutOff = 5e-05,
   width = 7,
   version = 2,
@@ -30,7 +31,7 @@ created by Jeff Vierstra (https://github.com/jvierstra/motif-clustering).}
 \item{annoName}{The name of the \code{peakAnnotation} object to be stored in the provided \code{ArchRProject}}
 
 \item{species}{The latin name of the species relevant to the supplied \code{ArchRProject}. This is used for identifying which motif to be
-used from CisBP/JASPAR. For JASPAR, \code{species} is passed to \code{TFBS::getMatrixSet} and some species names are not recognized. In these cases
+used from CisBP/JASPAR. For JASPAR, \code{species} is passed to \code{TFBSTools::getMatrixSet()} and some species names are not recognized. In these cases
 it is possible to use the NCBI taxonomy ID. By default, this function will attempt to guess the species based on the value from \code{getGenome()}.}
 
 \item{collection}{If one of the JASPAR motif sets is used via \code{motifSet}, this parameter allows you to indicate the JASPAR
@@ -38,8 +39,11 @@ collection to be used. See \code{getMatrixSet()} from \code{TFBSTools} for all o
 "vierstra", then this must either be "archetype" (for the v2.1 clustered models) or "individual" (for the original v1 individual motif models).
 NOTE: vierstra archetype motifs are currently in beta and have not been finalized by Jeff Vierstra.}
 
-\item{motifPWMs}{A custom set of motif PWMs as a PWMatrixList to be used instead of \code{motifSet} for adding motif annotations.
-If \code{motifPWMs} is used, \code{motifSet} will be ignored.}
+\item{motifPWMs}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use \code{motifList} instead.}
+
+\item{motifList}{A collections of transcription factor binding motifs stored as a \code{PWMatrixList} (position weight matrices)
+or \code{PFMatrixList} (position frequency matrices) class object used for adding motif annotations.
+If \code{motifList} is not \code{NULL}, \code{motifSet} will be ignored.}
 
 \item{cutOff}{The p-value cutoff to be used for motif search. The p-value is determined vs a background set of sequences
 (see \code{MOODS} for more details on this determination).}
@@ -53,7 +57,7 @@ it already exists in the given \code{ArchRProject}.}
 
 \item{logFile}{The path to a file to be used for logging ArchR output.}
 
-\item{...}{Additional parameters to be passed to \code{TFBSTools::getMatrixSet} for getting a JASPAR PWM object.}
+\item{...}{Additional parameters to be passed to \code{TFBSTools::getMatrixSet()} for getting a JASPAR PWM/PFM object.}
 }
 \description{
 This function adds information about which peaks contain motifs to a given ArchRProject. For each peak, a binary value

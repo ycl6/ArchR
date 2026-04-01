@@ -326,14 +326,16 @@ addPeakAnnotations <- function(
 #' created by Jeff Vierstra (https://github.com/jvierstra/motif-clustering). 
 #' @param annoName The name of the `peakAnnotation` object to be stored in the provided `ArchRProject`
 #' @param species The latin name of the species relevant to the supplied `ArchRProject`. This is used for identifying which motif to be
-#' used from CisBP/JASPAR. For JASPAR, `species` is passed to `TFBS::getMatrixSet` and some species names are not recognized. In these cases
+#' used from CisBP/JASPAR. For JASPAR, `species` is passed to `TFBSTools::getMatrixSet()` and some species names are not recognized. In these cases
 #' it is possible to use the NCBI taxonomy ID. By default, this function will attempt to guess the species based on the value from `getGenome()`.
 #' @param collection If one of the JASPAR motif sets is used via `motifSet`, this parameter allows you to indicate the JASPAR
 #' collection to be used. See `getMatrixSet()` from `TFBSTools` for all options to supply for collection. If `motifSet` is
 #' "vierstra", then this must either be "archetype" (for the v2.1 clustered models) or "individual" (for the original v1 individual motif models). 
 #' NOTE: vierstra archetype motifs are currently in beta and have not been finalized by Jeff Vierstra.
-#' @param motifPWMs A custom set of motif PWMs as a PWMatrixList to be used instead of `motifSet` for adding motif annotations.
-#' If `motifPWMs` is used, `motifSet` will be ignored.
+#' @param motifPWMs `r lifecycle::badge("deprecated")` use `motifList` instead.
+#' @param motifList A collections of transcription factor binding motifs stored as a `PWMatrixList` (position weight matrices)
+#' or `PFMatrixList` (position frequency matrices) class object used for adding motif annotations.
+#' If `motifList` is not `NULL`, `motifSet` will be ignored.
 #' @param cutOff The p-value cutoff to be used for motif search. The p-value is determined vs a background set of sequences
 #' (see `MOODS` for more details on this determination).
 #' @param width The width in basepairs to consider for motif matches. See the `motimatchr` package for more information.
@@ -341,7 +343,7 @@ addPeakAnnotations <- function(
 #' @param force A boolean value indicating whether to force the `peakAnnotation` object indicated by `annoName` to be overwritten if
 #' it already exists in the given `ArchRProject`.
 #' @param logFile The path to a file to be used for logging ArchR output.
-#' @param ... Additional parameters to be passed to `TFBSTools::getMatrixSet` for getting a JASPAR PWM object.
+#' @param ... Additional parameters to be passed to `TFBSTools::getMatrixSet()` for getting a JASPAR PWM/PFM object.
 #' 
 #' @examples
 #'
@@ -358,7 +360,8 @@ addMotifAnnotations <- function(
   annoName = "Motif",
   species = NULL,
   collection = "CORE",
-  motifPWMs = NULL,
+  motifPWMs = deprecated(),
+  motifList = NULL,
   cutOff = 5e-05, 
   width = 7,
   version = 2,
@@ -366,6 +369,11 @@ addMotifAnnotations <- function(
   logFile = createLogFile("addMotifAnnotations"),
   ...
   ){
+
+  if (lifecycle::is_present(motifPWMs)) {
+    lifecycle::deprecate_warn("1.0.3", "addMotifAnnotations(motifPWMs)", "addMotifAnnotations(motifList)")
+    motifList <- motifPWMs
+  }
 
   .validInput(input = ArchRProj, name = "ArchRProj", valid = c("ArchRProj"))
   .validInput(input = motifSet, name = "motifSet", valid = c("character", "null"))
@@ -377,15 +385,15 @@ addMotifAnnotations <- function(
   .validInput(input = force, name = "force", valid = c("boolean"))
   .validInput(input = logFile, name = "logFile", valid = c("character"))
 
-  if(!is.null(motifPWMs)){
-    if(!is(motifPWMs, "PWMatrixList")){
-      stop("User Supplied motifPWMS must be a PWMatrixList!")
+  if(!is.null(motifList)){
+    if(!is(motifList, "PWMatrixList") & !is(motifList, "PFMatrixList")){
+      stop("User supplied motifList must be a `PWMatrixList` or `PFMatrixList` class object!")
     }
     motifSet <- "Custom"
   }
 
   if(is.null(motifSet)){
-    stop("Must provide motifSet or motifPWMs!")
+    stop("Must provide motifSet or motifList!")
   }
 
   .requirePackage("motifmatchr", installInfo='BiocManager::install("motifmatchr")')
@@ -552,9 +560,8 @@ addMotifAnnotations <- function(
     motifSummary <- NULL
 
   }else if(tolower(motifSet)=="custom"){
-
     obj <- NULL
-    motifs <- motifPWMs
+    motifs <- motifList
     motifSummary <- NULL
 
   }else{
