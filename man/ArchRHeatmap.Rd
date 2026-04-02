@@ -21,6 +21,8 @@ ArchRHeatmap(
   fontSizeRows = 10,
   fontSizeCols = 10,
   fontSizeLabels = 8,
+  fontSizeLgdTitle = 8,
+  fontSizeLgdLab = 8,
   colAnnoPerRow = 4,
   showRowDendrogram = FALSE,
   showColDendrogram = FALSE,
@@ -64,6 +66,10 @@ ArchRHeatmap(
 \item{fontSizeCols}{A numeric value representing the font size for colnames.}
 
 \item{fontSizeLabels}{A numeric value representing the font size for labels.}
+
+\item{fontSizeLgdTitle}{A numeric value representing the font size for legend title.}
+
+\item{fontSizeLgdLab}{A numeric value representing the font size for legend labels.}
 
 \item{colAnnoPerRow}{An integer value describing the number of column annotations per row in the legend.}
 

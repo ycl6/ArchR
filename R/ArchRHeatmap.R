@@ -16,6 +16,8 @@
 #' @param fontSizeRows A numeric value representing the font size for rownames.
 #' @param fontSizeCols A numeric value representing the font size for colnames.
 #' @param fontSizeLabels A numeric value representing the font size for labels.
+#' @param fontSizeLgdTitle A numeric value representing the font size for legend title.
+#' @param fontSizeLgdLab A numeric value representing the font size for legend labels.
 #' @param colAnnoPerRow An integer value describing the number of column annotations per row in the legend.
 #' @param showRowDendrogram A boolean whether to show row dendrogram in heatmap.
 #' @param showColDendrogram A boolean whether to show column dendrogram in heatmap.
@@ -47,6 +49,8 @@ ArchRHeatmap <- function(
   fontSizeRows = 10,
   fontSizeCols = 10,
   fontSizeLabels = 8,
+  fontSizeLgdTitle = 8,
+  fontSizeLgdLab = 8,
   colAnnoPerRow = 4,
   showRowDendrogram = FALSE,
   showColDendrogram = FALSE,
@@ -79,6 +83,8 @@ ArchRHeatmap <- function(
     fontSizeRows = fontSizeRows,
     fontSizeCols = fontSizeCols,
     fontSizeLabels = fontSizeLabels,
+    fontSizeLgdTitle = fontSizeLgdTitle,
+    fontSizeLgdLab = fontSizeLgdLab,
     colAnnoPerRow = colAnnoPerRow,
     showRowDendrogram = showRowDendrogram,
     showColDendrogram = showColDendrogram,
@@ -113,6 +119,8 @@ ArchRHeatmap <- function(
   fontSizeRows = 10,
   fontSizeCols = 10,
   fontSizeLabels = 8,
+  fontSizeLgdTitle = 8,
+  fontSizeLgdLab = 8,
   colAnnoPerRow = 4,
   showRowDendrogram = FALSE,
   showColDendrogram = FALSE,
@@ -229,14 +237,16 @@ ArchRHeatmap <- function(
     
     #Main Stuff
     matrix = as.matrix(mat),
-    name = name,
     col = color, 
     
     #Heatmap Legend
     heatmap_legend_param = 
       list(
+           title = name, # set `name` as legend title as intended
+           title_gp = gpar(fontsize = fontSizeLgdTitle),
            at = c(0, 1),
            labels = c(round(min(limits),2), round(max(limits),2)),
+           labels_gp = gpar(fontsize = fontSizeLgdLab),
            color_bar = "continuous", 
            legend_direction = "horizontal",
            legend_width = unit(3, "cm")

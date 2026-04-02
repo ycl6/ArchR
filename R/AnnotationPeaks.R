@@ -1356,6 +1356,11 @@ enrichHeatmap <- function(...){
 #' @param clusterCols A boolean indicating whether or not to cluster columns in the heatmap.
 #' @param binaryClusterRows A boolean indicating whether or not to cluster rows using binary classification in the heatmap.
 #' @param labelRows A boolean indicating whether or not to label all rows in the heatmap.
+#' @param fontSizeRows A numeric value representing the font size for rownames.
+#' @param fontSizeCols A numeric value representing the font size for colnames.
+#' @param fontSizeLabels A numeric value representing the font size for labels.
+#' @param fontSizeLgdTitle A numeric value representing the font size for legend title.
+#' @param fontSizeLgdLab A numeric value representing the font size for legend labels.
 #' @param rastr A boolean value that indicates whether the plot should be rasterized using `ComplexHeatmap`. This does not rasterize
 #' lines and labels, just the internal portions of the plot.
 #' @param transpose A boolean determining whether to transpose the heatmap in the plot.
@@ -1401,6 +1406,11 @@ plotEnrichHeatmap <- function(
   clusterCols = TRUE,
   binaryClusterRows = TRUE,
   labelRows = TRUE,
+  fontSizeRows = 10,
+  fontSizeCols = 10,
+  fontSizeLabels = 8,
+  fontSizeLgdTitle = 8,
+  fontSizeLgdLab = 8,
   rastr = TRUE,
   transpose = FALSE,
   returnMatrix = FALSE,
@@ -1415,6 +1425,11 @@ plotEnrichHeatmap <- function(
   .validInput(input = clusterCols, name = "clusterCols", valid = c("boolean"))
   .validInput(input = binaryClusterRows, name = "binaryClusterRows", valid = c("boolean"))
   .validInput(input = labelRows, name = "labelRows", valid = c("boolean"))
+  .validInput(input = fontSizeRows, name = "fontSizeRows", valid = c("numeric"))
+  .validInput(input = fontSizeCols, name = "fontSizeCols", valid = c("numeric"))
+  .validInput(input = fontSizeLabels, name = "fontSizeLabels", valid = c("numeric"))
+  .validInput(input = fontSizeLgdTitle, name = "fontSizeLgdTitle", valid = c("numeric"))
+  .validInput(input = fontSizeLgdLab, name = "fontSizeLgdLab", valid = c("numeric"))
   .validInput(input = rastr, name = "rastr", valid = c("boolean"))
   .validInput(input = transpose, name = "transpose", valid = c("boolean"))
   .validInput(input = returnMatrix, name = "returnMatrix", valid = c("boolean"))
@@ -1504,7 +1519,11 @@ plotEnrichHeatmap <- function(
         clusterRows = FALSE,
         labelRows = TRUE,
         useRaster = rastr,
-        fontSizeCols = 6,
+        fontSizeRows = fontSizeRows,
+        fontSizeCols = fontSizeCols,
+        fontSizeLabels = fontSizeLabels,
+        fontSizeLgdTitle = fontSizeLgdTitle,
+        fontSizeLgdLab = fontSizeLgdLab,
         borderColor = borderColor,
         customColLabel = seq_len(ncol(mat2)),
         showRowDendrogram = FALSE,
@@ -1523,7 +1542,11 @@ plotEnrichHeatmap <- function(
         clusterRows = FALSE,
         labelRows = TRUE,
         useRaster = rastr,
-        fontSizeCols = 6,
+        fontSizeRows = fontSizeRows,
+        fontSizeCols = fontSizeCols,
+        fontSizeLabels = fontSizeLabels,
+        fontSizeLgdTitle = fontSizeLgdTitle,
+        fontSizeLgdLab = fontSizeLgdLab,
         borderColor = borderColor,
         customColLabel = seq_len(ncol(mat2)),
         showRowDendrogram = FALSE,
@@ -1552,7 +1575,11 @@ plotEnrichHeatmap <- function(
         clusterRows = clusterRows,
         useRaster = rastr,
         borderColor = borderColor,
-        fontSizeRows = 6,
+        fontSizeRows = fontSizeRows,
+        fontSizeCols = fontSizeCols,
+        fontSizeLabels = fontSizeLabels,
+        fontSizeLgdTitle = fontSizeLgdTitle,
+        fontSizeLgdLab = fontSizeLgdLab,
         customRowLabel = seq_len(nrow(mat2)),
         labelCols = TRUE,
         showColDendrogram = TRUE,
@@ -1571,7 +1598,11 @@ plotEnrichHeatmap <- function(
         clusterRows = clusterRows,
         useRaster = rastr,
         borderColor = borderColor,
-        fontSizeRows = 6,
+        fontSizeRows = fontSizeRows,
+        fontSizeCols = fontSizeCols,
+        fontSizeLabels = fontSizeLabels,
+        fontSizeLgdTitle = fontSizeLgdTitle,
+        fontSizeLgdLab = fontSizeLgdLab,
         customRowLabel = seq_len(nrow(mat2)),
         labelCols = TRUE,
         showColDendrogram = TRUE,

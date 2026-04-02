@@ -13,6 +13,11 @@ plotEnrichHeatmap(
   clusterCols = TRUE,
   binaryClusterRows = TRUE,
   labelRows = TRUE,
+  fontSizeRows = 10,
+  fontSizeCols = 10,
+  fontSizeLabels = 8,
+  fontSizeLgdTitle = 8,
+  fontSizeLgdLab = 8,
   rastr = TRUE,
   transpose = FALSE,
   returnMatrix = FALSE,
@@ -36,6 +41,16 @@ be lowered to improve visibility of the heatmap.}
 \item{binaryClusterRows}{A boolean indicating whether or not to cluster rows using binary classification in the heatmap.}
 
 \item{labelRows}{A boolean indicating whether or not to label all rows in the heatmap.}
+
+\item{fontSizeRows}{A numeric value representing the font size for rownames.}
+
+\item{fontSizeCols}{A numeric value representing the font size for colnames.}
+
+\item{fontSizeLabels}{A numeric value representing the font size for labels.}
+
+\item{fontSizeLgdTitle}{A numeric value representing the font size for legend title.}
+
+\item{fontSizeLgdLab}{A numeric value representing the font size for legend labels.}
 
 \item{rastr}{A boolean value that indicates whether the plot should be rasterized using \code{ComplexHeatmap}. This does not rasterize
 lines and labels, just the internal portions of the plot.}
