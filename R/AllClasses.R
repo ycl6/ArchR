@@ -2,6 +2,7 @@
 #' @importFrom Rcpp sourceCpp
 #' @importClassesFrom GenomicRanges GRanges
 #' @importFrom GenomicRanges GRanges
+#' @importFrom lifecycle deprecated
 #' @import data.table
 NULL
 
