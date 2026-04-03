@@ -47,7 +47,7 @@ plotBrowserTrack(
 
 \item{region}{A \code{GRanges} region that indicates the region to be plotted. If more than one region exists in the \code{GRanges} object,
 all will be plotted. If no region is supplied, then the \code{geneSymbol} argument can be used to center the plot window at the
-transcription start site of the supplied gene.}
+transcription start site of the supplied gene. If \code{geneSymbol} is supplied, the \code{region} argument is ignored.}
 
 \item{groupBy}{A string that indicates how cells should be grouped. This string corresponds to one of the standard or
 user-supplied \code{cellColData} metadata columns (for example, "Clusters"). Cells with the same value annotated in this metadata

@@ -669,7 +669,7 @@ ArchRBrowserTrack <- function(...){
 #' @param ArchRProj An `ArchRProject` object.
 #' @param region A `GRanges` region that indicates the region to be plotted. If more than one region exists in the `GRanges` object,
 #' all will be plotted. If no region is supplied, then the `geneSymbol` argument can be used to center the plot window at the
-#' transcription start site of the supplied gene.
+#' transcription start site of the supplied gene. If `geneSymbol` is supplied, the `region` argument is ignored.
 #' @param groupBy A string that indicates how cells should be grouped. This string corresponds to one of the standard or
 #' user-supplied `cellColData` metadata columns (for example, "Clusters"). Cells with the same value annotated in this metadata
 #' column will be grouped together and the average signal will be plotted.
@@ -825,18 +825,19 @@ plotBrowserTrack <- function(
   # Get Region Where Plot Will Occur (GenomicRanges)
   ##########################################################
   .logDiffTime("Validating Region", t1=tstart, verbose=verbose, logFile=logFile)
-  if(is.null(region)){
-    if(!is.null(geneSymbol)){
-      region <- geneAnnotation$genes
-      region <- region[which(tolower(mcols(region)$symbol) %in% tolower(geneSymbol))]
-      region <- region[order(match(tolower(mcols(region)$symbol), tolower(geneSymbol)))]
-      print(region)
-      region <- GenomicRanges::resize(region, 1, "start")
-      strand(region) <- "*"
-      region <- extendGR(region, upstream = upstream, downstream = downstream)
-    }
+  if(!is.null(geneSymbol)){
+    region <- geneAnnotation$genes
+    region <- region[which(tolower(mcols(region)$symbol) %in% tolower(geneSymbol))]
+    region <- region[order(match(tolower(mcols(region)$symbol), tolower(geneSymbol)))]
+    region <- GenomicRanges::resize(region, 1, "start")
+    strand(region) <- "*"
+    region <- extendGR(region, upstream = upstream, downstream = downstream)
+  } else if(is.null(region)) {
+    stop("Please provide `GRanges` region(s) or gene symbol(s) as input.")
   }
   region <- .validGRanges(region)
+  message("Region(s) to plot:")
+  print(region)
   .logThis(region, "region", logFile = logFile)
 
   if(is.null(geneSymbol)){
