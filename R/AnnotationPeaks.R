@@ -560,6 +560,28 @@ addMotifAnnotations <- function(
     motifSummary <- NULL
 
   }else if(tolower(motifSet)=="custom"){
+    is.dup <- duplicated(names(motifList))
+    if(sum(is.dup) > 0) {
+      message(sprintf("%d motifList names are duplicates. Uniquifing using motif names and ID.", sum(is.dup)))
+
+      # adapted from scuttle::uniquifyFeatureNames to make list names (motif names) unique
+      motif_names <- motif_ids <- character(length(motifList))
+      for(i in seq_along(motifList)) {
+        motif_names[i] <- motifList[[i]]@name
+        motif_ids[i] <- motifList[[i]]@ID
+      }
+      dup.names <- motif_names %in% motif_names[duplicated(motif_names)]
+      motif_names[dup.names] <- paste0(motif_names[dup.names], "_", motif_ids[dup.names])
+      names(motifList) <- motif_names
+
+      # check if the motifList names are now unique
+      if(sum(duplicated(names(motifList))) > 0) {
+        stop("The motifList names (after combining motif name and ID) are still not unique. Please manually fix the motifList names.")
+      } else {
+        message("Uniquifing motifList names done.")
+      }
+    }
+
     obj <- NULL
     motifs <- motifList
     motifSummary <- NULL
