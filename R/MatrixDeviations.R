@@ -98,6 +98,7 @@ addDeviationsMatrix <- function(
       matrixName <- paste0("MotifMatrix")
     }    
   }
+  message(sprintf("'%s' is the name used to store the deviations matrix.", matrixName))
   annotationsMatrix <- SummarizedExperiment::assay(matches)
   rownames(annotationsMatrix) <- paste0(seqnames(matches), "_", start(matches), "_", end(matches))
   annotationsMatrix <- as(annotationsMatrix, "dMatrix")
@@ -666,9 +667,8 @@ getVarDeviations <- function(ArchRProj = NULL, name = "MotifMatrix", plot = TRUE
   rowV <- rowV[order(rowV$combinedVars, decreasing=TRUE), ]
   rowV$rank <- seq_len(nrow(rowV))
 
-  print(head(rowV))
-
   if(plot){
+    print(head(rowV)) # only print snippet if plotting
     rowV <- data.frame(rowV)
     ggplot(rowV, aes(x = rank, y = combinedVars, color = combinedVars)) +
       geom_point(size = 1) + 
