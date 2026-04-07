@@ -309,7 +309,7 @@ getMatrixFromProject <- function(
 
   ArrowFiles <- getArrowFiles(ArchRProj)
 
-  cellNames <- ArchRProj$cellNames
+  cellNames <- getCellNames(ArchRProj)
 
   avMat <- getAvailableMatrices(ArchRProj)
   if(useMatrix %ni% avMat){
@@ -322,7 +322,7 @@ getMatrixFromProject <- function(
       t1 = tstart, verbose = FALSE, logFile = logFile)
 
     allCells <- .availableCells(ArrowFile = ArrowFiles[x], subGroup = useMatrix)
-    allCells <- allCells[allCells %in% cellNames]
+    allCells <- intersect(cellNames, allCells)
 
     if(length(allCells) != 0){
 
@@ -414,7 +414,7 @@ getMatrixFromProject <- function(
 #' @param excludeChr A character vector containing the `seqnames` of the chromosomes that should be excluded from this analysis.
 #' @param cellNames A character vector indicating the cell names of a subset of cells from which fragments whould be extracted.
 #' This allows for extraction of fragments from only a subset of selected cells. By default, this function will extract all cells from
-#' the provided ArrowFile using `getCellNames()`.
+#' the `ArchRProject` using `getCellNames()` if it is provided, or from the ArrowFile if not.
 #' @param ArchRProj An `ArchRProject` object to be used for getting additional information for cells in `cellColData`.
 #' In some cases, data exists within the `ArchRProject` object that does not exist within the ArrowFiles. To access this data, you can
 #' provide the `ArchRProject` object here.
@@ -491,6 +491,10 @@ getMatrixFromArrow <- function(
 
   .logDiffTime(paste0("Getting ",useMatrix," from ArrowFile : ", basename(ArrowFile)), 
     t1 = tstart, verbose = verbose, logFile = logFile)
+
+  if(!is.null(ArchRProj) & is.null(cellNames)){
+    cellNames <- getCellNames(ArchRProj)
+  }
 
   if(!is.null(cellNames)){
     allCells <- .availableCells(ArrowFile = ArrowFile, subGroup = useMatrix)
@@ -812,7 +816,7 @@ getMatrixFromArrow <- function(
 
   allCellsList <- lapply(seq_along(ArrowFiles), function(x){
     allCells <- .availableCells(ArrowFile = ArrowFiles[x], subGroup = useMatrix)
-    allCells <- allCells[allCells %in% cellNames]
+    allCells <- intersect(cellNames, allCells)
     if(length(allCells) != 0){
       allCells
     }else{
@@ -922,7 +926,7 @@ getMatrixFromArrow <- function(
     .logDiffTime(sprintf("Getting Partial Matrix %s of %s", x, length(ArrowFiles)), tstart, verbose = verbose)
 
     allCells <- .availableCells(ArrowFile = ArrowFiles[x], subGroup = useMatrix)
-    allCells <- allCells[allCells %in% cellNames]
+    allCells <- intersect(cellNames, allCells)
 
     #Handled 0 Cells
     if(length(allCells) == 0){
