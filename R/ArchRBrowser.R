@@ -1446,17 +1446,17 @@ plotBrowserTrack <- function(
       #Segment for Not Minus Stranded
       #################################################
       geom_segment(data = genesO[which(as.character(genesO$strand)!="-"),], 
-        aes(x = start, xend = end, y = cluster, yend = cluster, color = strand),size=geneWidth) +
+        aes(x = start, xend = end, y = cluster, yend = cluster, color = strand), linewidth = geneWidth) +
       #################################################
       #Segment for Minus Stranded
       #################################################
       geom_segment(data = genesO[which(as.character(genesO$strand)=="-"),], 
-        aes(x = end, xend = start, y = cluster, yend = cluster, color = strand),size=geneWidth) +
+        aes(x = end, xend = start, y = cluster, yend = cluster, color = strand), linewidth = geneWidth) +
       #################################################
       #Segement for Exons
       #################################################
-      geom_segment(data = exonsO, aes(x = start, xend = end, y = cluster, 
-        yend = cluster, color = strand),size=exonWidth) +
+      geom_segment(data = exonsO, 
+        aes(x = start, xend = end, y = cluster, yend = cluster, color = strand), linewidth = exonWidth) +
       #################################################
       #Colors
       #################################################
@@ -1613,7 +1613,8 @@ plotBrowserTrack <- function(
 
     p <- ggplot(data = featureO, aes(color = name)) +
       facet_grid(facet~.) + xlab("") +
-      geom_segment(data = featureO, aes(x = start, xend = end, y = name, yend = name, color = name), size=featureWidth) +
+      geom_segment(data = featureO, 
+        aes(x = start, xend = end, y = name, yend = name, color = name), linewidth = featureWidth) +
       scale_x_continuous(limits = c(start(region), end(region)), expand = c(0,0)) +
       scale_color_manual(values = pal) +
       theme(legend.text = element_text(size = baseSize)) + 
@@ -1964,7 +1965,7 @@ plotBrowserTrack <- function(
   )
 
   p <- ggplot(groupDF, aes(x=bp, y=y, width = tileSize, fill = group2, color = group2)) + 
-      geom_tile(size = scTileSize) + 
+      geom_tile(linewidth = scTileSize) + 
       facet_grid(group2 ~ ., scales="free_y") + 
       theme_ArchR() + 
       scale_color_manual(values = pal) +
