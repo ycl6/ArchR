@@ -13,17 +13,17 @@ getFragmentsFromProject(
 )
 }
 \arguments{
+\item{ArchRProj}{An \code{ArchRProject} object to get fragments from.}
+
 \item{subsetBy}{A Genomic Ranges object to subset fragments by.}
 
 \item{cellNames}{A character vector indicating the cell names of a subset of cells from which fragments whould be extracted.
 This allows for extraction of fragments from only a subset of selected cells. By default, this function will extract all cells
-from the provided ArrowFile using \code{getCellNames()}.}
+from the provided ArrowFile in the \code{ArchRProject}.}
 
 \item{verbose}{A boolean value indicating whether to use verbose output during execution of this function. Can be set to \code{FALSE} for a cleaner output.}
 
 \item{logFile}{The path to a file to be used for logging ArchR output.}
-
-\item{ArchRProject}{An \code{ArchRProject} object to get fragments from.}
 }
 \description{
 This function retrieves the fragments from a given ArchRProject as a GRangesList object.
