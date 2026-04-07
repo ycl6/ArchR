@@ -6,11 +6,11 @@
 #' 
 #' This function retrieves the fragments from a given ArchRProject as a GRangesList object.
 #'
-#' @param ArchRProject An `ArchRProject` object to get fragments from.
+#' @param ArchRProj An `ArchRProject` object to get fragments from.
 #' @param subsetBy A Genomic Ranges object to subset fragments by.
 #' @param cellNames A character vector indicating the cell names of a subset of cells from which fragments whould be extracted.
 #' This allows for extraction of fragments from only a subset of selected cells. By default, this function will extract all cells
-#' from the provided ArrowFile using `getCellNames()`.
+#' from the provided ArrowFile in the `ArchRProject`.
 #' @param verbose A boolean value indicating whether to use verbose output during execution of this function. Can be set to `FALSE` for a cleaner output.
 #' @param logFile The path to a file to be used for logging ArchR output.
 #'
@@ -75,7 +75,7 @@ getFragmentsFromProject <- function(
 #' @param chr A name of a chromosome to be used to subset the fragments `GRanges` object to a specific chromsome if desired.
 #' @param cellNames A character vector indicating the cell names of a subset of cells from which fragments whould be extracted.
 #' This allows for extraction of fragments from only a subset of selected cells. By default, this function will extract all cells
-#' from the provided ArrowFile using `getCellNames()`.
+#' from the provided ArrowFile.
 #' @param verbose A boolean value indicating whether to use verbose output during execution of this function. Can be set to `FALSE` for a cleaner output.
 #' @param logFile The path to a file to be used for logging ArchR output.
 #'
