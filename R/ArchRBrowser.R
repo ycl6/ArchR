@@ -950,6 +950,7 @@ plotBrowserTrack <- function(
         plotList$looptrack <- .loopTracks(
             loops = loops, 
             region = region[x], 
+            baseSize = baseSize,
             facetbaseSize = facetbaseSize,
             hideX = TRUE, 
             hideY = TRUE,
