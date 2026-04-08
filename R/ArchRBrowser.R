@@ -1545,7 +1545,7 @@ plotBrowserTrack <- function(
   title = "FeatureTrack", 
   pal = NULL,
   baseSize = NULL,
-  facetbaseSize = NULL,
+  facetbaseSize = 7,
   featureWidth = 2, 
   borderWidth = 0.4, 
   hideX = FALSE, 
@@ -1686,7 +1686,7 @@ plotBrowserTrack <- function(
   title = "LoopTrack", 
   pal = NULL,
   baseSize = 9, 
-  facetbaseSize = 9,
+  facetbaseSize = 7,
   featureWidth = 2, 
   borderWidth = 0.4, 
   hideX = FALSE, 
@@ -1750,7 +1750,6 @@ plotBrowserTrack <- function(
 
     if(testDim){
 
-      loopO$facet <- title
       if(is.null(pal)){
         pal <- colorRampPalette(c("#E6E7E8","#3A97FF","#8816A7","black"))(100)
       }
@@ -1762,37 +1761,39 @@ plotBrowserTrack <- function(
         coord_cartesian(ylim = c(-100,0)) +
         scale_x_continuous(limits = c(start(region), end(region)), expand = c(0,0)) +
         scale_color_gradientn(colors = pal, limits = c(valueMin, valueMax)) +
-        theme(legend.text = element_text(size = baseSize)) +
         theme_ArchR(baseSize = baseSize, baseLineSize = borderWidth, baseRectSize = borderWidth, legendPosition = "right") +
         theme(strip.text.y = element_text(size = facetbaseSize, angle = 0), strip.background = element_blank(),
-          legend.box.background = element_rect(color = NA)) +
-        .gg_guides(color= guide_colorbar(barwidth = 0.75, barheight = 3))
+              legend.title = element_blank(), legend.text = element_text(size = facetbaseSize-2),
+              legend.box.background = element_rect(color = NA)) +
+        .gg_guides(color = guide_colorbar(barwidth = 0.75, barheight = 5))
 
     }else{
 
       #create empty plot
-      df <- data.frame(facet = "LoopTrack", start = 0, end = 0, strand = "*", symbol = "none")
+      df <- data.frame(facet = title, start = 0, end = 0, strand = "*", symbol = "none")
       p <- ggplot(data = df, aes(start, end)) + 
         geom_point() +
         facet_grid(facet~.) +
         theme_ArchR(baseSize = baseSize, baseLineSize = borderWidth, baseRectSize = borderWidth) +
         scale_x_continuous(limits = c(start(region), end(region)), expand = c(0,0)) +
-        theme(axis.title.x=element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank()) +
-        theme(axis.title.y=element_blank(), axis.text.y=element_blank(),axis.ticks.y=element_blank())
+        theme(strip.text.y = element_text(size = facetbaseSize, angle = 0), strip.background = element_blank(),
+              axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+              axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
 
     }
 
   }else{
 
     #create empty plot
-    df <- data.frame(facet = "LoopTrack", start = 0, end = 0, strand = "*", symbol = "none")
+    df <- data.frame(facet = title, start = 0, end = 0, strand = "*", symbol = "none")
     p <- ggplot(data = df, aes(start, end)) + 
       geom_point() +
       facet_grid(facet~.) +
       theme_ArchR(baseSize = baseSize, baseLineSize = borderWidth, baseRectSize = borderWidth) +
       scale_x_continuous(limits = c(start(region), end(region)), expand = c(0,0)) +
-      theme(axis.title.x=element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank()) +
-      theme(axis.title.y=element_blank(), axis.text.y=element_blank(),axis.ticks.y=element_blank())
+      theme(strip.text.y = element_text(size = facetbaseSize, angle = 0), strip.background = element_blank(),
+            axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+            axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
 
   }
 
