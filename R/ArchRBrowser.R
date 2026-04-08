@@ -1608,6 +1608,10 @@ plotBrowserTrack <- function(
 
     if(is.null(pal)){
       pal <- paletteDiscrete(values = gtools::mixedsort(unique(featureO$name), decreasing = TRUE))
+    } else {
+      if(sum(unique(featureO$name) == "FeatureTrack") == 1) { # single peak track
+        pal <- paletteDiscrete(values = "FeatureTrack")
+      }
     }
 
     featureO$name <- factor(paste0(featureO$name), levels = names(featureList))
