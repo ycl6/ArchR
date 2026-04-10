@@ -493,13 +493,13 @@ addGroupCoverages <- function(
         ############################################################
         # Identifying High-Quality peaks when Cells and Fragments are abundant
         ############################################################
-        #Samples Passing Min Filter
+        #Samples Passing Min Cells Filter
         samplesPassFilter <- sum(nCellsPerSample >= minCells) 
         samplesThatCouldBeMergedToPass <- floor(sum(nCellsPerSample[nCellsPerSample < minCells]) / minCells)
         #First Group Cells By Sample
         cellGroups <- split(cells, sampleLabels)
-        #Identify Samples That Pass Min Cells
-        samples <- names(nCellsPerSample)[nCellsPerSample > minCells]
+        #Identify Samples Passing Min Cells Filter
+        samples <- names(nCellsPerSample)[nCellsPerSample >= minCells]
         cellGroupsPass <- cellGroups[samples]
         #Samples That Do Not Pass
         if(!all(names(cellGroups) %in% names(cellGroupsPass))){
