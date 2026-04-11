@@ -19,6 +19,8 @@
 #' @param sampleRatio The fraction of the total cells that can be sampled to generate any given pseudo-bulk replicate.
 #' @param excludeChr A character vector containing the `seqnames` of the chromosomes that should be excluded from this analysis.
 #' @param kmerLength The length of the k-mer used for estimating Tn5 bias.
+#' @param seed A number to be used as the seed for random number generation required when sampling cells for generating pseudo-bulk replicates. It is recommended
+#' to keep track of the seed used so that you can reproduce results downstream. Default is `seed = 1`.
 #' @param threads The number of threads to be used for parallel computing.
 #' @param returnGroups A boolean value that indicates whether to return sample-guided cell-groupings without creating coverages.
 #' This is used mainly in `addReproduciblePeakSet()` when MACS2 is not being used to call peaks but rather peaks are called from a
@@ -51,6 +53,7 @@ addGroupCoverages <- function(
   sampleRatio = 0.8,
   excludeChr = NULL,
   kmerLength = 6,
+  seed = 1,
   threads = getArchRThreads(),
   returnGroups = FALSE,
   parallelParam = NULL,
@@ -71,6 +74,7 @@ addGroupCoverages <- function(
   .validInput(input = sampleRatio, name = "sampleRatio", valid = c("numeric"))
   .validInput(input = excludeChr, name = "excludeChr", valid = c("character", "null"))
   .validInput(input = kmerLength, name = "kmerLength", valid = c("integer"))
+  .validInput(input = seed, name = "seed", valid = c("integer","null"))
   .validInput(input = threads, name = "threads", valid = c("integer"))
   .validInput(input = returnGroups, name = "returnGroups", valid = c("boolean"))
   .validInput(input = parallelParam, name = "parallelParam", valid = c("parallelparam","null"))
@@ -85,6 +89,8 @@ addGroupCoverages <- function(
   if(sampleLabels %ni% colnames(ArchRProj@cellColData)) {
     stop("sampleLabels is not a column in cellColData!")
   }
+
+  if(!is.null(seed)) set.seed(seed)
 
   tstart <- Sys.time()
   .startLogging(logFile = logFile)
@@ -596,7 +602,6 @@ addGroupCoverages <- function(
 }
 
 .leastOverlapCells <- function(x = NULL, n = 2, nSample = 0.8 * length(l), iterations = 100, replace = FALSE){   
-    set.seed(1)
     maxMat <- matrix(0, nrow = length(x), ncol = n)
     for(i in seq_len(iterations)){
       currentMat <- matrix(0, nrow = length(x), ncol = n)

@@ -17,6 +17,7 @@ addGroupCoverages(
   sampleRatio = 0.8,
   excludeChr = NULL,
   kmerLength = 6,
+  seed = 1,
   threads = getArchRThreads(),
   returnGroups = FALSE,
   parallelParam = NULL,
@@ -53,6 +54,9 @@ of excessively large files which would negatively impact memory requirements.}
 \item{excludeChr}{A character vector containing the \code{seqnames} of the chromosomes that should be excluded from this analysis.}
 
 \item{kmerLength}{The length of the k-mer used for estimating Tn5 bias.}
+
+\item{seed}{A number to be used as the seed for random number generation required when sampling cells for generating pseudo-bulk replicates. It is recommended
+to keep track of the seed used so that you can reproduce results downstream. Default is \code{seed = 1}.}
 
 \item{threads}{The number of threads to be used for parallel computing.}
 
