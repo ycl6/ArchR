@@ -18,6 +18,7 @@ addGroupCoverages(
   excludeChr = NULL,
   kmerLength = 6,
   seed = 1,
+  cellGroups = NULL,
   threads = getArchRThreads(),
   returnGroups = FALSE,
   parallelParam = NULL,
@@ -58,6 +59,9 @@ of excessively large files which would negatively impact memory requirements.}
 \item{seed}{A number to be used as the seed for random number generation required when sampling cells for generating pseudo-bulk replicates. It is recommended
 to keep track of the seed used so that you can reproduce results downstream. Default is \code{seed = 1}.}
 
+\item{cellGroups}{A \code{SimpleList} object containing pre-defined cell groups. If not \code{NULL}, the pseudo-bulk replicates will be generated
+using the cell group information provided here and ignore settings such as \code{minCells}, \code{maxCells}, \code{minReplicates}, \code{maxReplicates}, and \code{sampleRatio}.}
+
 \item{threads}{The number of threads to be used for parallel computing.}
 
 \item{returnGroups}{A boolean value that indicates whether to return sample-guided cell-groupings without creating coverages.
@@ -84,5 +88,31 @@ proj <- getTestProject()
 
 # Add Group Coverages
 proj <- addGroupCoverages(proj, force = TRUE)
+
+\donttest{
+# **Using pre-defined cell groups to calculate group coverages**
+# In this example using the test project, we create a SimpleList object called `cellGroups`,
+# that has 3 list items corresponding to the 3 cell types (defined by `groupBy`),
+# and each cell type list item contains 2 list items corresponding to pseudobulk replicates,
+# with (almost) equally divided cell numbers in each, and all cells are used once.
+set.seed(1)
+groupBy <- "CellType"
+grouoLabels <- getCellColData(proj)[,groupBy]
+CellNames <- getCellNames(proj)
+cellGroups <- list()
+
+for(ct in names(table(grouoLabels))) {
+    cn <- CellNames[grouoLabels == ct]
+    nRep1 <- floor(length(cn)/2) # number of cells in rep1
+    cn1 <- sample(cn, size = nRep1)
+    cn2 <- cn[cn \%ni\% cn1]
+    if(!identical(sort(cn), sort(c(cn1, cn2)))) stop("Not all cells in the cellGroups.")
+    cellGroups[[ct]] <- as(list(Rep1 = cn1, Rep2 = cn2), "SimpleList")
+}
+cellGroups <- as(cellGroups, "SimpleList")
+
+# Add group coverages using pre-defined pseudobulk replicates
+proj <- addGroupCoverages(proj, groupBy = groupBy, cellGroups = cellGroups, force = TRUE)
+}
 
 }

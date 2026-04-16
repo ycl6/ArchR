@@ -21,6 +21,8 @@
 #' @param kmerLength The length of the k-mer used for estimating Tn5 bias.
 #' @param seed A number to be used as the seed for random number generation required when sampling cells for generating pseudo-bulk replicates. It is recommended
 #' to keep track of the seed used so that you can reproduce results downstream. Default is `seed = 1`.
+#' @param cellGroups A `SimpleList` object containing pre-defined cell groups. If not `NULL`, the pseudo-bulk replicates will be generated 
+#' using the cell group information provided here and ignore settings such as `minCells`, `maxCells`, `minReplicates`, `maxReplicates`, and `sampleRatio`.
 #' @param threads The number of threads to be used for parallel computing.
 #' @param returnGroups A boolean value that indicates whether to return sample-guided cell-groupings without creating coverages.
 #' This is used mainly in `addReproduciblePeakSet()` when MACS2 is not being used to call peaks but rather peaks are called from a
@@ -39,6 +41,32 @@
 #' # Add Group Coverages
 #' proj <- addGroupCoverages(proj, force = TRUE)
 #'
+#' \donttest{
+#' # **Using pre-defined cell groups to calculate group coverages**
+#' # In this example using the test project, we create a SimpleList object called `cellGroups`,
+#' # that has 3 list items corresponding to the 3 cell types (defined by `groupBy`),
+#' # and each cell type list item contains 2 list items corresponding to pseudobulk replicates,
+#' # with (almost) equally divided cell numbers in each, and all cells are used once.
+#' set.seed(1)
+#' groupBy <- "CellType"
+#' grouoLabels <- getCellColData(proj)[,groupBy]
+#' CellNames <- getCellNames(proj)
+#' cellGroups <- list()
+#'
+#' for(ct in names(table(grouoLabels))) {
+#'     cn <- CellNames[grouoLabels == ct]
+#'     nRep1 <- floor(length(cn)/2) # number of cells in rep1
+#'     cn1 <- sample(cn, size = nRep1)
+#'     cn2 <- cn[cn %ni% cn1]
+#'     if(!identical(sort(cn), sort(c(cn1, cn2)))) stop("Not all cells in the cellGroups.")
+#'     cellGroups[[ct]] <- as(list(Rep1 = cn1, Rep2 = cn2), "SimpleList")
+#' }
+#' cellGroups <- as(cellGroups, "SimpleList")
+#'
+#' # Add group coverages using pre-defined pseudobulk replicates
+#' proj <- addGroupCoverages(proj, groupBy = groupBy, cellGroups = cellGroups, force = TRUE)
+#' }
+#'
 #' @export
 addGroupCoverages <- function(
   ArchRProj = NULL,
@@ -54,6 +82,7 @@ addGroupCoverages <- function(
   excludeChr = NULL,
   kmerLength = 6,
   seed = 1,
+  cellGroups = NULL,
   threads = getArchRThreads(),
   returnGroups = FALSE,
   parallelParam = NULL,
@@ -159,40 +188,51 @@ addGroupCoverages <- function(
   #####################################################
   #Create Cell Groups
   #####################################################
-  cellGroups <- lapply(seq_along(uniqueGroups), function(x){
-      subColDat <- getCellColData(ArchRProj)[which(groups==uniqueGroups[x]),]
-      cellNamesx <- rownames(subColDat)
-      #if(length(cellNamesx) < minCells){
-      #  outListx <- SimpleList(LowCellGroup = cellNamesx) or NULL
-      #}
-      if(useLabels){
-        sampleLabelsx <- paste0(subColDat[,sampleLabels])
-      } else {
-        sampleLabelsx <- NULL
-      }
-      outListx <- .identifyGroupsForPseudoBulk(
-        cells = cellNamesx, 
-        sampleLabels = sampleLabelsx,
-        useLabels = useLabels,
-        minCells = minCells, 
-        maxCells = maxCells,
-        minReplicates = minReplicates, 
-        maxReplicates = maxReplicates,
-        sampleRatio = sampleRatio,
-        prefix = sprintf("%s (%s of %s) :", uniqueGroups[x], x, length(uniqueGroups)),
-        logFile = logFile
-      )
-      if(is.null(outListx)){
-        return(NULL)
-      }
-      if(is.null(names(outListx))){
-          names(outListx) <- paste0("Rep", seq_along(outListx))
-      }else if(any(names(outListx)=="")){
-          names(outListx)[which(names(outListx)=="")] <- paste0("Rep", which(names(outListx)==""))
-      }
-      outListx
-  }) %>% SimpleList
-  names(cellGroups) <- uniqueGroups
+  if(is.null(cellGroups)) {
+    cellGroups <- lapply(seq_along(uniqueGroups), function(x){
+        subColDat <- getCellColData(ArchRProj)[which(groups==uniqueGroups[x]),]
+        cellNamesx <- rownames(subColDat)
+        #if(length(cellNamesx) < minCells){
+        #  outListx <- SimpleList(LowCellGroup = cellNamesx) or NULL
+        #}
+        if(useLabels){
+          sampleLabelsx <- paste0(subColDat[,sampleLabels])
+        } else {
+          sampleLabelsx <- NULL
+        }
+        outListx <- .identifyGroupsForPseudoBulk(
+          cells = cellNamesx,
+          sampleLabels = sampleLabelsx,
+          useLabels = useLabels,
+          minCells = minCells,
+          maxCells = maxCells,
+          minReplicates = minReplicates,
+          maxReplicates = maxReplicates,
+          sampleRatio = sampleRatio,
+          prefix = sprintf("%s (%s of %s) :", uniqueGroups[x], x, length(uniqueGroups)),
+          logFile = logFile
+        )
+        if(is.null(outListx)){
+          return(NULL)
+        }
+        if(is.null(names(outListx))){
+            names(outListx) <- paste0("Rep", seq_along(outListx))
+        }else if(any(names(outListx)=="")){
+            names(outListx)[which(names(outListx)=="")] <- paste0("Rep", which(names(outListx)==""))
+        }
+        outListx
+    }) %>% SimpleList
+    names(cellGroups) <- uniqueGroups
+  } else {
+    # do some checking of the cellGroups against groupBy names and cell names
+    if(!identical(sort(names(cellGroups)), sort(as.character(uniqueGroups)))) {
+      stop("The cellGroups names are not the same as the group names defined in `groupBy`.")
+    }
+
+    if(sum(unlist(unlist(cellGroups)) %ni% cellNames)) {
+      stop("One or more cell names are not found in the ArchRProject.")
+    }
+  }
   Params$cellGroups <- cellGroups
 
   #####################################################
