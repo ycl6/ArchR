@@ -13,11 +13,12 @@ addReproduciblePeakSet(
   maxPeaks = 150000,
   minCells = 25,
   excludeChr = c("chrM", "chrY"),
-  pathToMacs2 = if (tolower(peakMethod) == "macs2") findMacs2() else NULL,
+  pathToMacs2 = lifecycle::deprecated(),
+  pathToMACS = NULL,
   genomeSize = NULL,
   shift = -75,
   extsize = 150,
-  method = if (tolower(peakMethod) == "macs2") "q" else "p",
+  method = if (tolower(peakMethod) != "tiles") "q" else "p",
   cutOff = 0.1,
   additionalParams = "--nomodel --nolambda",
   extendSummits = 250,
@@ -38,7 +39,8 @@ addReproduciblePeakSet(
 
 \item{groupBy}{The name of the column in \code{cellColData} to use for grouping cells together for peak calling.}
 
-\item{peakMethod}{The name of peak calling method to be used. Options include "Macs2" for using macs2 callpeak or "Tiles" for using a TileMatrix.}
+\item{peakMethod}{The name of peak calling method to be used. Options include "Macs2" for using macs2 callpeak,
+"Macs3" for using macs3 callpeak, or "Tiles" for using a TileMatrix. Default is \code{"Macs2"}.}
 
 \item{reproducibility}{A string that indicates how peak reproducibility should be handled. This string is dynamic and can be a
 function of \code{n} where \code{n} is the number of samples being assessed. For example, \code{reproducibility = "2"} means at least 2 samples
@@ -54,22 +56,26 @@ This is important to allow for exclusion of pseudo-bulk replicates derived from 
 
 \item{excludeChr}{A character vector containing the \code{seqnames} of the chromosomes that should be excluded from peak calling.}
 
-\item{pathToMacs2}{The full path to the MACS2 executable.}
+\item{pathToMacs2}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use \code{pathToMACS} instead.}
 
-\item{genomeSize}{The genome size to be used for MACS2 peak calling (see MACS2 documentation). This is required if genome is not hg19, hg38, mm9, or mm10.}
+\item{pathToMACS}{The full path to the MACS2 or MACS3 executable.}
+
+\item{genomeSize}{The mappable genome size or effective genome size
+(see the \code{-g} paramater in \href{https://macs3-project.github.io/MACS/docs/callpeak.html#options-controling-peak-calling-behaviors}{MACS documentation}).
+This is required if genome is not hg19, hg38, mm9, or mm10.}
 
 \item{shift}{The number of basepairs to shift each Tn5 insertion. When combined with \code{extsize} this allows you to create proper fragments,
-centered at the Tn5 insertion site, for use with MACS2 (see MACS2 documentation).}
+centered at the Tn5 insertion site, for use with MACS (see MACS documentation).}
 
-\item{extsize}{The number of basepairs to extend the MACS2 fragment after \code{shift} has been applied. When combined with \code{extsize} this
-allows you to create proper fragments, centered at the Tn5 insertion site, for use with MACS2 (see MACS2 documentation).}
+\item{extsize}{The number of basepairs to extend the MACS fragment after \code{shift} has been applied. When combined with \code{extsize} this
+allows you to create proper fragments, centered at the Tn5 insertion site, for use with MACS (see MACS documentation).}
 
-\item{method}{The method to use for significance testing in MACS2. Options are "p" for p-value and "q" for q-value. When combined with
-\code{cutOff} this gives the method and significance threshold for peak calling (see MACS2 documentation).}
+\item{method}{The method to use for significance testing in MACS. Options are "p" for p-value and "q" for q-value. When combined with
+\code{cutOff} this gives the method and significance threshold for peak calling (see MACS documentation).}
 
-\item{cutOff}{The numeric significance cutOff for the testing method indicated by \code{method} (see MACS2 documentation).}
+\item{cutOff}{The numeric significance cutOff for the testing method indicated by \code{method} (see MACS documentation).}
 
-\item{additionalParams}{A string of additional parameters to pass to MACS2 (see MACS2 documentation).}
+\item{additionalParams}{A string of additional parameters to pass to MACS (see MACS documentation).}
 
 \item{extendSummits}{The number of basepairs to extend peak summits (in both directions) to obtain final fixed-width peaks. For example,
 \code{extendSummits = 250} will create 501-bp fixed-width peaks from the 1-bp summits.}
@@ -96,7 +102,7 @@ information (GC content) or chromosome sizes.}
 \item{logFile}{The path to a file to be used for logging ArchR output.}
 
 \item{...}{Additional parameters to be pass to \code{addGroupCoverages()} to get sample-guided pseudobulk cell-groupings. Only used for TileMatrix-based
-peak calling (not for MACS2). See \code{addGroupCoverages()} for more info.}
+peak calling (not for MACS2 and MACS3). See \code{addGroupCoverages()} for more info.}
 }
 \description{
 This function will get insertions from coverage files, call peaks,
@@ -107,10 +113,13 @@ and merge peaks to get a "Union Reproducible Peak Set".
 # Get Test ArchR Project
 proj <- getTestProject()
 
-# Add Peak Matrix Tiles
-proj <- addReproduciblePeakSet(proj, peakMethod = "tiles")
+# Create union peak set using MACS2
+proj <- addReproduciblePeakSet(proj, peakMethod = "Macs2")
 
-# Add Peak Matrix Macs2 (Preferred)
-proj <- addReproduciblePeakSet(proj, peakMethod = "macs2")
+# Create union peak set using MACS3
+proj <- addReproduciblePeakSet(proj, peakMethod = "Macs3")
+
+# Create union peak set using TileMatrix (do not recommend)
+proj <- addReproduciblePeakSet(proj, peakMethod = "Tiles")
 
 }

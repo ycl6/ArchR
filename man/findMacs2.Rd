@@ -2,12 +2,12 @@
 % Please edit documentation in R/ReproduciblePeakSet.R
 \name{findMacs2}
 \alias{findMacs2}
-\title{Find the installed location of the MACS2 executable}
+\title{Find the installed location of the MACS2 executable (deprecated)}
 \usage{
 findMacs2()
 }
 \description{
-This function attempts to find the path to the MACS2 executable by serting the path and python's pip.
+This function attempts to find the path to the MACS2 executable by searching the path and python's pip.
 }
 \examples{
 
