@@ -21,6 +21,8 @@ saveArchRProject(
 
 \item{overwrite}{When writing to outputDirectory, overwrite existing files with new files.}
 
+\item{load}{A boolean indicating whether to load the newly saved \code{ArchRProject} from \code{outputDirectory} after saving is completed.}
+
 \item{dropCells}{A boolean indicating whether to drop cells that are not in \code{ArchRProject} from corresponding Arrow Files.}
 
 \item{logFile}{The path to a file to be used for logging ArchR output.}

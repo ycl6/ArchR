@@ -535,6 +535,7 @@ loadArchRProject <- function(
 #' @param ArchRProj An `ArchRProject` object.
 #' @param outputDirectory A directory path to save all ArchR output and `ArchRProject` to. Default is outputDirectory of the `ArchRProject`.
 #' @param overwrite When writing to outputDirectory, overwrite existing files with new files.
+#' @param load A boolean indicating whether to load the newly saved `ArchRProject` from `outputDirectory` after saving is completed. 
 #' @param dropCells A boolean indicating whether to drop cells that are not in `ArchRProject` from corresponding Arrow Files.
 #' @param logFile The path to a file to be used for logging ArchR output.
 #' @param threads The number of threads to use for parallel execution.
