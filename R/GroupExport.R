@@ -3,8 +3,8 @@ NULL
 
 #' @export
 exportGroupSE <- function(...){
-    .Deprecated("getGroupSE")
-    getGroupSE(...)
+  lifecycle::deprecate_warn("1.0.3", "exportGroupSE()", "getGroupSE()")
+  getGroupSE(...)
 }
 
 #' Export Group Summarized Experiment 

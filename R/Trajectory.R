@@ -449,8 +449,8 @@ getTrajectory <- function(
 
 #' @export
 trajectoryHeatmap <- function(...){
-    .Deprecated("plotTrajectoryHeatmap")
-    plotTrajectoryHeatmap(...)
+  lifecycle::deprecate_warn("1.0.3", "trajectoryHeatmap()", "plotTrajectoryHeatmap()")
+  plotTrajectoryHeatmap(...)
 }
 
 #' Plot a Heatmap of Features across a Trajectory

@@ -656,8 +656,8 @@ ArchRBrowser <- function(
 
 #' @export
 ArchRBrowserTrack <- function(...){
-    .Deprecated("plotBrowserTrack")
-    plotBrowserTrack(...)
+  lifecycle::deprecate_warn("1.0.3", "ArchRBrowserTrack()", "plotBrowserTrack()")
+  plotBrowserTrack(...)
 }
 
 #' Plot an ArchR Region Track

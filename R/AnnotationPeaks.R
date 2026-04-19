@@ -1361,8 +1361,8 @@ peakAnnoEnrichment <- function(
 
 #' @export
 enrichHeatmap <- function(...){
-    .Deprecated("plotEnrichHeatmap")
-    plotEnrichHeatmap(...)
+  lifecycle::deprecate_warn("1.0.3", "enrichHeatmap()", "plotEnrichHeatmap()")
+  plotEnrichHeatmap(...)
 }
 
 #' Plot a Heatmap of Peak Annotation Hypergeometric Enrichment in Marker Peaks.

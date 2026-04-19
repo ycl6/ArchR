@@ -1498,8 +1498,8 @@ getPeak2GeneLinks <- function(
 
 #' @export
 peak2GeneHeatmap <- function(...){
-    .Deprecated("plotPeak2GeneHeatmap")
-    plotPeak2GeneHeatmap(...)
+  lifecycle::deprecate_warn("1.0.3", "peak2GeneHeatmap()", "plotPeak2GeneHeatmap()")
+  plotPeak2GeneHeatmap(...)
 }
 
 #' Plot Peak2Gene Heatmap from an ArchRProject

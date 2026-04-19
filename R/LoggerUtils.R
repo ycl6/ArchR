@@ -152,10 +152,6 @@ createLogFile <- function(
   logFile
 }
 
-.messageDiffTime <- function(...){ #Deprecated
-  .logDiffTime(...)
-}
-
 .logDiffTime <- function(
   main = "",
   t1 = NULL,

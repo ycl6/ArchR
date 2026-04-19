@@ -4,8 +4,8 @@
 
 #' @export
 markerFeatures <- function(...){
-    .Deprecated("getMarkerFeatures")
-    getMarkerFeatures(...)
+  lifecycle::deprecate_warn("1.0.3", "markerFeatures()", "getMarkerFeatures()")
+  getMarkerFeatures(...)
 }
 
 #' Identify Marker Features for each cell grouping
@@ -904,8 +904,8 @@ getMarkerFeatures <- function(
 
 #' @export
 markerHeatmap <- function(...){
-    .Deprecated("plotMarkerHeatmap")
-    plotMarkerHeatmap(...)
+  lifecycle::deprecate_warn("1.0.3", "markerHeatmap()", "plotMarkerHeatmap()")
+  plotMarkerHeatmap(...)
 }
 
 #' Plot a Heatmap of Identified Marker Features
@@ -1384,8 +1384,8 @@ getMarkers <- function(
 
 #' @export
 markerPlot <- function(...){
-    .Deprecated("plotMarkers")
-    plotMarkers(...)
+  lifecycle::deprecate_warn("1.0.3", "markerPlot()", "plotMarkers()")
+  plotMarkers(...)
 }
 
 #' Plot Differential Markers
