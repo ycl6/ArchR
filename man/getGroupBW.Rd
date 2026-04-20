@@ -6,7 +6,8 @@
 \usage{
 getGroupBW(
   ArchRProj = NULL,
-  groupBy = "Sample",
+  groupBy = lifecycle::deprecated(),
+  ids = NULL,
   normMethod = "ReadsInTSS",
   tileSize = 100,
   maxCells = 1000,
@@ -19,9 +20,12 @@ getGroupBW(
 \arguments{
 \item{ArchRProj}{An \code{ArchRProject} object.}
 
-\item{groupBy}{A string that indicates how cells should be grouped. This string corresponds to one of the standard or
-user-supplied \code{cellColData} metadata columns (for example, "Clusters"). Cells with the same value annotated in this metadata
-column will be grouped together and the average signal will be plotted.}
+\item{groupBy}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} use \code{ids} instead.}
+
+\item{ids}{A character vector or factor specifying the group to which each cell belongs to. Alternatively,
+a \code{data.frame} of vectors or factors, in which case unique combination of these define the cell groups.
+It can also be a string corresponds to one of the column name in \code{cellColData}, for example, \code{ids = "Sample"}.
+Default behaviour is to group all cells into one single group, i.e. \code{ids = NULL}.}
 
 \item{normMethod}{The name of the column in \code{cellColData} by which normalization should be performed. The recommended and default value
 is "ReadsInTSS" which simultaneously normalizes tracks based on sequencing depth and sample data quality. Accepted values are
@@ -29,7 +33,7 @@ is "ReadsInTSS" which simultaneously normalizes tracks based on sequencing depth
 
 \item{tileSize}{The numeric width of the tile/bin in basepairs for plotting ATAC-seq signal tracks. All insertions in a single bin will be summed.}
 
-\item{maxCells}{Maximum number of cells used for each bigwig.}
+\item{maxCells}{Maximum number of cells used for each bigwig. All cells are used if \code{maxCells = NULL}.}
 
 \item{ceiling}{Maximum contribution of accessibility per cell in each tile.}
 
@@ -47,7 +51,14 @@ This function will group, summarize and export a bigwig for each group in an Arc
 # Get Test ArchR Project
 proj <- getTestProject()
 
-# Get Group BW
-bw <- getGroupBW(proj, groupBy = "Clusters")
+# Get BigWigs for each Cluster
+ids <- proj$Clusters
+bw <- getGroupBW(proj, ids = ids)
+
+# Same as above, but provided the column name in found cellColData
+bw <- getGroupBW(proj, ids = "Clusters")
+
+# Get BigWigs for each unique combination of Cluster and CellType
+bw <- getGroupBW(proj, ids = data.frame(proj$Clusters, proj$CellType))
 
 }

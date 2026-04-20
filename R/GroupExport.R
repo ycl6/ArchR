@@ -235,14 +235,16 @@ getPBGroupSE <- function(
 #' This function will group, summarize and export a bigwig for each group in an ArchRProject.
 #'
 #' @param ArchRProj An `ArchRProject` object.
-#' @param groupBy A string that indicates how cells should be grouped. This string corresponds to one of the standard or
-#' user-supplied `cellColData` metadata columns (for example, "Clusters"). Cells with the same value annotated in this metadata
-#' column will be grouped together and the average signal will be plotted.
+#' @param groupBy `r lifecycle::badge("deprecated")` use `ids` instead.
+#' @param ids A character vector or factor specifying the group to which each cell belongs to. Alternatively,
+#' a `data.frame` of vectors or factors, in which case unique combination of these define the cell groups.
+#' It can also be a string corresponds to one of the column name in `cellColData`, for example, `ids = "Sample"`.
+#' Default behaviour is to group all cells into one single group, i.e. `ids = NULL`.
 #' @param normMethod The name of the column in `cellColData` by which normalization should be performed. The recommended and default value
 #' is "ReadsInTSS" which simultaneously normalizes tracks based on sequencing depth and sample data quality. Accepted values are
 #' "None", "ReadsInTSS", "nCells", "ReadsInPromoter", or "nFrags".
 #' @param tileSize The numeric width of the tile/bin in basepairs for plotting ATAC-seq signal tracks. All insertions in a single bin will be summed.
-#' @param maxCells Maximum number of cells used for each bigwig.
+#' @param maxCells Maximum number of cells used for each bigwig. All cells are used if `maxCells = NULL`.
 #' @param ceiling Maximum contribution of accessibility per cell in each tile.
 #' @param verbose A boolean specifying to print messages during computation.
 #' @param threads An integer specifying the number of threads for parallel.
@@ -253,13 +255,21 @@ getPBGroupSE <- function(
 #' # Get Test ArchR Project
 #' proj <- getTestProject()
 #'
-#' # Get Group BW
-#' bw <- getGroupBW(proj, groupBy = "Clusters")
+#' # Get BigWigs for each Cluster
+#' ids <- proj$Clusters
+#' bw <- getGroupBW(proj, ids = ids)
+#'
+#' # Same as above, but provided the column name in found cellColData
+#' bw <- getGroupBW(proj, ids = "Clusters")
+#'
+#' # Get BigWigs for each unique combination of Cluster and CellType
+#' bw <- getGroupBW(proj, ids = data.frame(proj$Clusters, proj$CellType))
 #'
 #' @export
 getGroupBW <- function(
   ArchRProj = NULL,
-  groupBy = "Sample",
+  groupBy = lifecycle::deprecated(),
+  ids = NULL,
   normMethod = "ReadsInTSS",
   tileSize = 100,
   maxCells = 1000,
@@ -270,10 +280,10 @@ getGroupBW <- function(
   ){
 
   .validInput(input = ArchRProj, name = "ArchRProj", valid = c("ArchRProj"))
-  .validInput(input = groupBy, name = "useMatrix", valid = c("character"))
-  .validInput(input = normMethod, name = "groupBy", valid = c("character"))
-  .validInput(input = tileSize, name = "divideN", valid = c("integer"))
-  .validInput(input = maxCells, name = "scaleTo", valid = c("integer", "null"))
+  .validInput(input = ids, name = "ids", valid = c("character","factor","data.frame","null"))
+  .validInput(input = normMethod, name = "normMethod", valid = c("character"))
+  .validInput(input = tileSize, name = "tileSize", valid = c("integer"))
+  .validInput(input = maxCells, name = "maxCells", valid = c("integer", "null"))
   .validInput(input = ceiling, name = "ceiling", valid = c("integer", "null"))
   .validInput(input = verbose, name = "verbose", valid = c("boolean"))
   .validInput(input = threads, name = "threads", valid = c("integer"))
@@ -291,7 +301,6 @@ getGroupBW <- function(
   .logThis(normMethod, "normMethod", logFile = logFile)
 
   ArrowFiles <- getArrowFiles(ArchRProj)
-  Groups <- getCellColData(ArchRProj = ArchRProj, select = groupBy, drop = TRUE)
 
   if(tolower(normMethod) %in% tolower(c("ReadsInTSS", "ReadsInPromoter", "nFrags"))){
     normBy <- getCellColData(ArchRProj = ArchRProj, select = normMethod)
@@ -299,11 +308,40 @@ getGroupBW <- function(
     normBy <- NULL
   }
 
-  if(!.isDiscrete(Groups)){
-    stop("groupBy must be a discrete variable!")
+  Cells <- ArchRProj$cellNames
+
+  if(lifecycle::is_present(groupBy)) {
+    lifecycle::deprecate_warn("1.0.3", "getGroupBW(groupBy)", "getGroupBW(ids)")
+    ids <- groupBy
   }
 
-  Cells <- ArchRProj$cellNames
+  # Check ids, and create new.ids
+  if(is(ids, "data.frame")) {
+    new.ids <- apply(ids, 1, paste, collapse = "-")
+  } else if(!is.null(ids)) {
+    # check if a single string corresponds to cellColData column name
+    if(length(ids) == 1) {
+      if(ids %in% colnames(getCellColData(multiome))) {
+        new.ids <- getCellColData(ArchRProj = ArchRProj, select = ids, drop = TRUE)
+      } else {
+        stop(sprintf("Cannot find %s in cellColData", ids))
+      }
+    } else {
+      new.ids <- ids
+    }
+  } else {
+    new.ids <- rep("AllCells", length(Cells))
+  }
+
+  if (length(Cells) != length(new.ids)) {
+    stop("length of 'ids' and number of cells are not equal")
+  } else {
+    Groups <- new.ids
+  }
+
+  if(!.isDiscrete(Groups)){
+    stop("'ids' must be a discrete variable!")
+  }
 
   cellGroups <- split(Cells, Groups)
 
@@ -311,6 +349,7 @@ getGroupBW <- function(
   
     gnames <- names(cellGroups)
   
+    set.seed(1)
     cellGroups <- lapply(seq_along(cellGroups), function(x){
       if(length(cellGroups[[x]]) > maxCells){
         sample(cellGroups[[x]], maxCells)
@@ -353,6 +392,8 @@ getGroupBW <- function(
   }
 
   covFiles <- c()
+
+  message(sprintf("Creating bigWig files for %d groups", length(cellGroups)))
 
   for(i in seq_along(cellGroups)){
 
@@ -406,11 +447,11 @@ getGroupBW <- function(
   threads = 1
   ){
 
-  .logDiffTime(sprintf("%s (%s of %s) : Creating BigWig for Group", names(cellGroups)[i], i, length(cellGroups)), tstart, logFile = logFile, verbose = verbose)
 
   #Cells
   cellGroupi <- cellGroups[[i]]
-  #print(sum(normBy[cellGroupi, 1]))
+
+  .logDiffTime(sprintf("%s (%s of %s) : Creating BigWig for Group with %d cells", names(cellGroups)[i], i, length(cellGroups), length(cellGroupi)), tstart, logFile = logFile, verbose = verbose)
 
   #Bigwig File!
   covFile <- file.path(bwDir, paste0(make.names(names(cellGroups)[i]), "-TileSize-",tileSize,"-normMethod-",normMethod,"-ArchR.bw"))
