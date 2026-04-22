@@ -46,10 +46,12 @@ addReproduciblePeakSet(
 function of \code{n} where \code{n} is the number of samples being assessed. For example, \code{reproducibility = "2"} means at least 2 samples
 must have a peak call at this locus and \code{reproducibility = "(n+1)/2"} means that the majority of samples must have a peak call at this locus.}
 
-\item{peaksPerCell}{The upper limit of the number of peaks that can be identified per cell-grouping in \code{groupBy}. This is useful
-for controlling how many peaks can be called from cell groups with low cell numbers.}
+\item{peaksPerCell}{A numeric threshold for the maximum peaks to retain per cell. This value is used to calculate
+the maximum peaks per cell-grouping defined by \code{groupBy}, and used in conjunction with \code{maxPeaks} to determine the final threshold.
+This is a useful paramater to control the number of peaks can be called from cell groups with low cell numbers.}
 
-\item{maxPeaks}{A numeric threshold for the maximum peaks to retain per group from \code{groupBy} in the union reproducible peak set.}
+\item{maxPeaks}{A numeric threshold for the maximum peaks to retain per group from \code{groupBy} in the union reproducible peak set.
+Together with \code{peaksPerCell}, the minimum value from \code{maxPeaks} and \verb{peaksPerCell * number of cells in a group} is the final threshold.}
 
 \item{minCells}{The minimum allowable number of unique cells that was used to create the coverage files on which peaks are called.
 This is important to allow for exclusion of pseudo-bulk replicates derived from very low cell numbers.}

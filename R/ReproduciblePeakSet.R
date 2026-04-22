@@ -14,9 +14,11 @@
 #' @param reproducibility A string that indicates how peak reproducibility should be handled. This string is dynamic and can be a
 #' function of `n` where `n` is the number of samples being assessed. For example, `reproducibility = "2"` means at least 2 samples
 #' must have a peak call at this locus and `reproducibility = "(n+1)/2"` means that the majority of samples must have a peak call at this locus.
-#' @param peaksPerCell The upper limit of the number of peaks that can be identified per cell-grouping in `groupBy`. This is useful
-#' for controlling how many peaks can be called from cell groups with low cell numbers.
+#' @param peaksPerCell A numeric threshold for the maximum peaks to retain per cell. This value is used to calculate
+#' the maximum peaks per cell-grouping defined by `groupBy`, and used in conjunction with `maxPeaks` to determine the final threshold.
+#' This is a useful paramater to control the number of peaks can be called from cell groups with low cell numbers.
 #' @param maxPeaks A numeric threshold for the maximum peaks to retain per group from `groupBy` in the union reproducible peak set.
+#' Together with `peaksPerCell`, the minimum value from `maxPeaks` and `peaksPerCell * number of cells in a group` is the final threshold.
 #' @param minCells The minimum allowable number of unique cells that was used to create the coverage files on which peaks are called.
 #' This is important to allow for exclusion of pseudo-bulk replicates derived from very low cell numbers.
 #' @param excludeChr A character vector containing the `seqnames` of the chromosomes that should be excluded from peak calling.
