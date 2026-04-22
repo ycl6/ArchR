@@ -263,7 +263,7 @@ getPBGroupSE <- function(
 #' bw <- getGroupBW(proj, ids = "Clusters")
 #'
 #' # Get BigWigs for each unique combination of Cluster and CellType
-#' bw <- getGroupBW(proj, ids = data.frame(proj$Clusters, proj$CellType))
+#' bw <- getGroupBW(proj, ids = data.frame(Clusters = proj$Clusters, CellType = proj$CellType))
 #'
 #' @export
 getGroupBW <- function(
@@ -316,21 +316,26 @@ getGroupBW <- function(
   }
 
   # Check ids, and create new.ids
+  # groupBy is now used as sub-folder name inside the 'GroupBigWigs' folder
   if(is(ids, "data.frame")) {
     new.ids <- apply(ids, 1, paste, collapse = "-")
+    groupBy <- paste(colnames(ids), collapse = "-")
   } else if(!is.null(ids)) {
     # check if a single string corresponds to cellColData column name
     if(length(ids) == 1) {
       if(ids %in% colnames(getCellColData(multiome))) {
         new.ids <- getCellColData(ArchRProj = ArchRProj, select = ids, drop = TRUE)
+        groupBy <- ids
       } else {
         stop(sprintf("Cannot find %s in cellColData", ids))
       }
     } else {
       new.ids <- ids
+      groupBy <- "Group"
     }
   } else {
     new.ids <- rep("AllCells", length(Cells))
+    groupBy <- "AllCells"
   }
 
   if (length(Cells) != length(new.ids)) {

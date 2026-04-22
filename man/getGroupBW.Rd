@@ -59,6 +59,6 @@ bw <- getGroupBW(proj, ids = ids)
 bw <- getGroupBW(proj, ids = "Clusters")
 
 # Get BigWigs for each unique combination of Cluster and CellType
-bw <- getGroupBW(proj, ids = data.frame(proj$Clusters, proj$CellType))
+bw <- getGroupBW(proj, ids = data.frame(Clusters = proj$Clusters, CellType = proj$CellType))
 
 }
