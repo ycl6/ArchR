@@ -7,8 +7,10 @@
 saveArchRProject(
   ArchRProj = NULL,
   outputDirectory = getOutputDirectory(ArchRProj),
+  fullPath = getArchRPathFormat(),
   overwrite = TRUE,
   load = TRUE,
+  showLogo = TRUE,
   dropCells = FALSE,
   logFile = createLogFile("saveArchRProject"),
   threads = getArchRThreads()
@@ -19,9 +21,14 @@ saveArchRProject(
 
 \item{outputDirectory}{A directory path to save all ArchR output and \code{ArchRProject} to. Default is outputDirectory of the \code{ArchRProject}.}
 
+\item{fullPath}{A boolean value indicating whether full (absolute) path of the \code{outputDirectory} is used in saving ArchRProject,
+and stored in the newly saved \code{ArchRProject} if \code{load = TRUE}. Default is \code{TRUE}.}
+
 \item{overwrite}{When writing to outputDirectory, overwrite existing files with new files.}
 
 \item{load}{A boolean indicating whether to load the newly saved \code{ArchRProject} from \code{outputDirectory} after saving is completed.}
+
+\item{showLogo}{A boolean value indicating whether to show the ascii ArchR logo after successful loading the newly saved \code{ArchRProject}.}
 
 \item{dropCells}{A boolean indicating whether to drop cells that are not in \code{ArchRProject} from corresponding Arrow Files.}
 

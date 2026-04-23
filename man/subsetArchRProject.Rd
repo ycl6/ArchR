@@ -8,8 +8,10 @@ subsetArchRProject(
   ArchRProj = NULL,
   cells = getCellNames(ArchRProj),
   outputDirectory = "ArchRSubset",
+  fullPath = getArchRPathFormat(),
   dropCells = TRUE,
   logFile = NULL,
+  showLogo = TRUE,
   threads = getArchRThreads(),
   force = FALSE
 )
@@ -21,9 +23,14 @@ subsetArchRProject(
 
 \item{outputDirectory}{A directory path to save all ArchR output and the subsetted \code{ArchRProject} to.}
 
+\item{fullPath}{A boolean value indicating whether full (absolute) path of the \code{outputDirectory} is stored in the subsetted ArchRProject.
+Default is \code{TRUE}.}
+
 \item{dropCells}{A boolean indicating whether to drop cells that are not in \code{ArchRProject} from corresponding Arrow Files.}
 
 \item{logFile}{The path to a file to be used for logging ArchR output.}
+
+\item{showLogo}{A boolean value indicating whether to show the ascii ArchR logo after successful creation of the subsetted \code{ArchRProject}.}
 
 \item{threads}{The number of threads to use for parallel execution.}
 

@@ -451,6 +451,50 @@ getArchRLB <- function() {
   }
 }
 
+#' Set the globally-applied outputDirectory path format
+#'
+#' This function will set the path format (absolute vs. relative paths) of the `outputDirectory`
+#' used in ArchR functions.
+#'
+#' @param fullPath A boolean value indicating whether full (absolute) path format of the
+#' `outputDirectory` is used in ArchR functions.  Default is `TRUE`.
+#'
+#' @examples
+#'
+#' # Store and use relative path format
+#' setArchRPathFormat(fullPath = FALSE)
+#'
+#' @export
+setArchRPathFormat <- function(fullPath = TRUE) {
+  .validInput(input = fullPath, name = "fullPath", valid = "boolean")
+  if(fullPath) {
+    message("Using absolute path format for 'outputDirectory'.")
+  } else {
+    message("Using relative path format for 'outputDirectory'.")
+  }
+  options(ArchR.fullPath = fullPath)
+}
+
+#' Get the globally-applied outputDirectory path format
+#'
+#' This function will get the path format setup of `outputDirectory` used in ArchR functions.
+#' If `TRUE`, absolute path is used, and relative path if the function returns `FALSE`.
+#'
+#' @examples
+#'
+#' # Get path format setup
+#' getArchRPathFormat()
+#'
+#' @export
+getArchRPathFormat <- function() {
+  fullPath <- options()[["ArchR.fullPath"]]
+  if(!is.null(fullPath) & is.logical(fullPath)){
+    fullPath
+  } else {
+    setArchRPathFormat(fullPath = TRUE)
+  }
+}
+
 ##########################################################################################
 # h5 compression level
 ##########################################################################################

@@ -4,10 +4,18 @@
 \alias{loadArchRProject}
 \title{Load Previous ArchRProject into R}
 \usage{
-loadArchRProject(path = "./", force = FALSE, showLogo = TRUE)
+loadArchRProject(
+  path = "./",
+  fullPath = getArchRPathFormat(),
+  force = FALSE,
+  showLogo = TRUE
+)
 }
 \arguments{
 \item{path}{A character path to an \code{ArchRProject} directory that was previously saved using \code{saveArchRProject()}.}
+
+\item{fullPath}{A boolean value indicating whether full (absolute) path of the \code{outputDirectory} is stored in the ArchRProject.
+Default is \code{TRUE}.}
 
 \item{force}{A boolean value indicating whether missing optional \code{ArchRProject} components (i.e. peak annotations /
 background peaks) should be ignored when re-normalizing file paths. If set to \code{FALSE} loading of the \code{ArchRProject}

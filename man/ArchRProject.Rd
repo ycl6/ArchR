@@ -7,6 +7,7 @@
 ArchRProject(
   ArrowFiles = NULL,
   outputDirectory = "ArchROutput",
+  fullPath = getArchRPathFormat(),
   copyArrows = TRUE,
   geneAnnotation = getGeneAnnotation(),
   genomeAnnotation = getGenomeAnnotation(),
@@ -18,6 +19,9 @@ ArchRProject(
 \item{ArrowFiles}{A character vector containing the relative paths to the ArrowFiles to be used.}
 
 \item{outputDirectory}{A name for the relative path of the outputDirectory for ArchR results. Relative to the current working directory.}
+
+\item{fullPath}{A boolean value indicating whether full (absolute) path of the \code{outputDirectory} is stored in the ArchRProject.
+Default is \code{TRUE}.}
 
 \item{copyArrows}{A boolean value indicating whether ArrowFiles should be copied into \code{outputDirectory}.}
 

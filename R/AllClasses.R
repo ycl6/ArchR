@@ -82,6 +82,8 @@ setMethod("show", "ArchRProject",
 #'
 #' @param ArrowFiles A character vector containing the relative paths to the ArrowFiles to be used.
 #' @param outputDirectory A name for the relative path of the outputDirectory for ArchR results. Relative to the current working directory.
+#' @param fullPath A boolean value indicating whether full (absolute) path of the `outputDirectory` is stored in the ArchRProject.
+#' Default is `TRUE`.
 #' @param copyArrows A boolean value indicating whether ArrowFiles should be copied into `outputDirectory`.
 #' @param geneAnnotation The `geneAnnotation` object (see `createGeneAnnotation()`) to be used for downstream analyses such as calculating
 #' TSS Enrichment Scores, Gene Scores, etc.
@@ -102,6 +104,7 @@ setMethod("show", "ArchRProject",
 ArchRProject <- function(
   ArrowFiles = NULL, 
   outputDirectory = "ArchROutput", 
+  fullPath = getArchRPathFormat(),
   copyArrows = TRUE,
   geneAnnotation = getGeneAnnotation(),
   genomeAnnotation = getGenomeAnnotation(),
@@ -111,6 +114,7 @@ ArchRProject <- function(
 
   .validInput(input = ArrowFiles, name = "ArrowFiles", valid = "character")
   .validInput(input = outputDirectory, name = "outputDirectory", valid = "character")
+  .validInput(input = fullPath, name = "fullPath", valid = "boolean")
   .validInput(input = copyArrows, name = "copyArrows", valid = "boolean")
   geneAnnotation <- .validGeneAnnotation(geneAnnotation)
   genomeAnnotation <- .validGenomeAnnotation(genomeAnnotation)
@@ -121,11 +125,20 @@ ArchRProject <- function(
   if(grepl(" ", outputDirectory)){
     stop("outputDirectory cannot have a space in the path! Path : ", outputDirectory)
   }
+
   dir.create(outputDirectory,showWarnings=FALSE)
-  if(grepl(" ", normalizePath(outputDirectory))){
-    stop("outputDirectory cannot have a space in the full path! Full path : ", normalizePath(outputDirectory))
+
+  if(fullPath) {
+    outputPath <- normalizePath(outputDirectory) # absolute path
+  } else {
+    outputPath <- outputDirectory # relative path to the current working folder
   }
-  sampleDirectory <- file.path(normalizePath(outputDirectory), "ArrowFiles")
+
+  if(grepl(" ", outputPath)){
+    stop("outputDirectory cannot have a space in the full path! Full path : ", outputPath)
+  }
+
+  sampleDirectory <- file.path(outputPath, "ArrowFiles")
   dir.create(sampleDirectory,showWarnings=FALSE)
 
   if(is.null(ArrowFiles)){
@@ -191,7 +204,7 @@ ArchRProject <- function(
 
   message("Initializing ArchRProject...")
   AProj <- new("ArchRProject", 
-    projectMetadata = SimpleList(outputDirectory = normalizePath(outputDirectory)),
+    projectMetadata = SimpleList(outputDirectory = outputPath),
     projectSummary = SimpleList(),
     sampleColData = sampleColData,
     sampleMetadata = sampleMetadata,
@@ -376,6 +389,8 @@ recoverArchRProject <- function(ArchRProj){
 #' This function will load a previously saved ArchRProject and re-normalize paths for usage.
 #' 
 #' @param path A character path to an `ArchRProject` directory that was previously saved using `saveArchRProject()`.
+#' @param fullPath A boolean value indicating whether full (absolute) path of the `outputDirectory` is stored in the ArchRProject.
+#' Default is `TRUE`.
 #' @param force A boolean value indicating whether missing optional `ArchRProject` components (i.e. peak annotations /
 #' background peaks) should be ignored when re-normalizing file paths. If set to `FALSE` loading of the `ArchRProject`
 #' will fail unless all components can be found.
@@ -401,11 +416,13 @@ recoverArchRProject <- function(ArchRProj){
 #' @export
 loadArchRProject <- function(
   path = "./", 
+  fullPath = getArchRPathFormat(),
   force = FALSE, 
   showLogo = TRUE
   ){
 
   .validInput(input = path, name = "path", valid = "character")
+  .validInput(input = fullPath, name = "fullPath", valid = "boolean")
   .validInput(input = force, name = "force", valid = "boolean")
   .validInput(input = showLogo, name = "showLogo", valid = "boolean")
 
@@ -417,10 +434,15 @@ loadArchRProject <- function(
 
   ArchRProj <- recoverArchRProject(readRDS(path2Proj))
   outputDir <- getOutputDirectory(ArchRProj)
-  outputDirNew <- normalizePath(path)
+
+  if(fullPath) {
+    newDirPath <- normalizePath(path) # absolute path
+  } else {
+    newDirPath <- path # relative path to the current working folder
+  }
 
   #1. Arrows Paths
-  ArrowFilesNew <- file.path(outputDirNew, "ArrowFiles", basename(ArchRProj@sampleColData$ArrowFiles))
+  ArrowFilesNew <- file.path(newDirPath, "ArrowFiles", basename(ArchRProj@sampleColData$ArrowFiles))
   if(!all(file.exists(ArrowFilesNew))){
     stop("ArrowFiles do not exist in saved ArchRProject!")
   }
@@ -438,7 +460,7 @@ loadArchRProject <- function(
 
         if(tolower(ArchRProj@peakAnnotation[[i]]$Positions) != "none"){
 
-          PositionsNew <- gsub(outputDir, outputDirNew, ArchRProj@peakAnnotation[[i]]$Positions)
+          PositionsNew <- gsub(outputDir, newDirPath, ArchRProj@peakAnnotation[[i]]$Positions)
           if(!all(file.exists(PositionsNew))){
             if(force){
               keepAnno[i] <- FALSE
@@ -456,7 +478,7 @@ loadArchRProject <- function(
       #Matches
       if(!is.null(ArchRProj@peakAnnotation[[i]]$Matches)){
 
-        MatchesNew <- gsub(outputDir, outputDirNew, ArchRProj@peakAnnotation[[i]]$Matches)
+        MatchesNew <- gsub(outputDir, newDirPath, ArchRProj@peakAnnotation[[i]]$Matches)
         if(!all(file.exists(MatchesNew))){
           if(force){
             message("Matches for peakAnnotation do not exist in saved ArchRProject!")
@@ -481,7 +503,7 @@ loadArchRProject <- function(
 
     if(!is.null(S4Vectors::metadata(getPeakSet(ArchRProj))$bgdPeaks)){
 
-      bgdPeaksNew <- gsub(outputDir, outputDirNew, S4Vectors::metadata(getPeakSet(ArchRProj))$bgdPeaks)
+      bgdPeaksNew <- gsub(outputDir, newDirPath, S4Vectors::metadata(getPeakSet(ArchRProj))$bgdPeaks)
 
       if(!all(file.exists(bgdPeaksNew))){
         
@@ -509,7 +531,7 @@ loadArchRProject <- function(
     groupC <- length(ArchRProj@projectMetadata$GroupCoverages)
     for(z in seq_len(groupC)){
       zdata <- ArchRProj@projectMetadata$GroupCoverages[[z]]$coverageMetadata
-      zfiles <- gsub(outputDir, outputDirNew, zdata$File)
+      zfiles <- gsub(outputDir, newDirPath, zdata$File)
       ArchRProj@projectMetadata$GroupCoverages[[z]]$coverageMetadata$File <- zfiles
       stopifnot(all(file.exists(zfiles)))
     }
@@ -517,7 +539,7 @@ loadArchRProject <- function(
 
   #5. Set Output Directory 
 
-  ArchRProj@projectMetadata$outputDirectory <- outputDirNew
+  ArchRProj@projectMetadata$outputDirectory <- newDirPath
 
   message("Successfully loaded ArchRProject!")
   if(showLogo){
@@ -534,8 +556,11 @@ loadArchRProject <- function(
 #' 
 #' @param ArchRProj An `ArchRProject` object.
 #' @param outputDirectory A directory path to save all ArchR output and `ArchRProject` to. Default is outputDirectory of the `ArchRProject`.
+#' @param fullPath A boolean value indicating whether full (absolute) path of the `outputDirectory` is used in saving ArchRProject,
+#' and stored in the newly saved `ArchRProject` if `load = TRUE`. Default is `TRUE`.
 #' @param overwrite When writing to outputDirectory, overwrite existing files with new files.
 #' @param load A boolean indicating whether to load the newly saved `ArchRProject` from `outputDirectory` after saving is completed. 
+#' @param showLogo A boolean value indicating whether to show the ascii ArchR logo after successful loading the newly saved `ArchRProject`.
 #' @param dropCells A boolean indicating whether to drop cells that are not in `ArchRProject` from corresponding Arrow Files.
 #' @param logFile The path to a file to be used for logging ArchR output.
 #' @param threads The number of threads to use for parallel execution.
@@ -551,8 +576,10 @@ loadArchRProject <- function(
 saveArchRProject <- function(
   ArchRProj = NULL,
   outputDirectory = getOutputDirectory(ArchRProj),
+  fullPath = getArchRPathFormat(),
   overwrite = TRUE,
   load = TRUE,
+  showLogo = TRUE,
   dropCells = FALSE,
   logFile = createLogFile("saveArchRProject"),
   threads = getArchRThreads()
@@ -560,30 +587,40 @@ saveArchRProject <- function(
 
   .validInput(input = ArchRProj, name = "ArchRProj", valid = "ArchRProj")
   .validInput(input = outputDirectory, name = "outputDirectory", valid = "character")
+  .validInput(input = fullPath, name = "fullPath", valid = "boolean")
   .validInput(input = overwrite, name = "overwrite", valid = "boolean")
   .validInput(input = load, name = "load", valid = "boolean")
+  .validInput(input = showLogo, name = "showLogo", valid = "boolean")
 
   if(grepl(" ", outputDirectory)){
     stop("outputDirectory cannot have a space in the path! Path : ", outputDirectory)
   }
 
   dir.create(outputDirectory, showWarnings=FALSE)
-  outputDirectory <- normalizePath(outputDirectory)
-  outDirOld <- normalizePath(getOutputDirectory(ArchRProj))
-  
+
+  if(fullPath) {
+    # absolute path
+    outputPath <- normalizePath(outputDirectory)
+    oldDirPath <- normalizePath(getOutputDirectory(ArchRProj))
+  } else {
+    # relative path to the current working folder
+    outputPath <- outputDirectory
+    oldDirPath <- getOutputDirectory(ArchRProj)
+  }
+
   newProj <- ArchRProj
   ArrowFiles <- getArrowFiles(ArchRProj)
   ArrowFiles <- ArrowFiles[names(ArrowFiles) %in% unique(newProj$Sample)]
 
-  oldFiles <- list.files(outDirOld)
+  oldFiles <- list.files(oldDirPath)
   oldFiles <- oldFiles[oldFiles %ni% c("ArrowFiles", "ImputeWeights", "Save-ArchR-Project.rds")]
 
-  dir.create(file.path(outputDirectory, "ArrowFiles"), showWarnings=FALSE)
-  ArrowFilesNew <- file.path(outputDirectory, "ArrowFiles", basename(ArrowFiles))
+  dir.create(file.path(outputPath, "ArrowFiles"), showWarnings=FALSE)
+  ArrowFilesNew <- file.path(outputPath, "ArrowFiles", basename(ArrowFiles))
   names(ArrowFilesNew) <- names(ArrowFiles)
 
-  if(outputDirectory != outDirOld){
-    message("Copying ArchRProject to new outputDirectory : ", normalizePath(outputDirectory))
+  if(outputPath != oldDirPath){
+    message("Copying ArchRProject to new outputDirectory : ", outputPath)
   }
 
   if(!identical(paste0(ArrowFiles), paste0(ArrowFilesNew))){
@@ -628,7 +665,7 @@ saveArchRProject <- function(
 
   }
 
-  if(outputDirectory != outDirOld){
+  if(outputPath != oldDirPath){
 
     #Empty Impute Weights If Changing Directory Because This Could Be A Different Set of Cells
     if(!is.null(getImputeWeights(newProj))){
@@ -640,8 +677,8 @@ saveArchRProject <- function(
     message("Copying Other Files...")
     for(i in seq_along(oldFiles)){
       message(sprintf("Copying Other Files (%s of %s): %s", i, length(oldFiles), oldFiles[i]))
-      oldPath <- file.path(outDirOld, oldFiles[i])
-      file.copy(oldPath, outputDirectory, recursive=TRUE, overwrite=overwrite)
+      oldPath <- file.path(oldDirPath, oldFiles[i])
+      file.copy(oldPath, outputPath, recursive=TRUE, overwrite=overwrite)
     }
 
     #Set New Info
@@ -653,7 +690,7 @@ saveArchRProject <- function(
     if(length(groupC) > 0){
       for(z in seq_len(groupC)){
         zdata <- newProj@projectMetadata$GroupCoverages[[z]]$coverageMetadata
-        zfiles <- gsub(outDirOld, outputDirectory, zdata$File)
+        zfiles <- gsub(oldDirPath, outputPath, zdata$File)
         newProj@projectMetadata$GroupCoverages[[z]]$coverageMetadata$File <- zfiles
         stopifnot(all(file.exists(zfiles)))
       }
@@ -662,11 +699,11 @@ saveArchRProject <- function(
   }
 
   message("Saving ArchRProject...")
-  .safeSaveRDS(newProj, file.path(outputDirectory, "Save-ArchR-Project.rds"))
+  .safeSaveRDS(newProj, file.path(outputPath, "Save-ArchR-Project.rds"))
   
   if(load){
     message("Loading ArchRProject...")
-    loadArchRProject(path = outputDirectory)
+    loadArchRProject(path = outputPath, fullPath = fullPath, showLogo = showLogo)
   }
 
 }
@@ -678,8 +715,11 @@ saveArchRProject <- function(
 #' @param ArchRProj An `ArchRProject` object.
 #' @param cells A vector of cells to subset `ArchRProject` by. Alternatively can provide a subset `ArchRProject`.
 #' @param outputDirectory A directory path to save all ArchR output and the subsetted `ArchRProject` to.
+#' @param fullPath A boolean value indicating whether full (absolute) path of the `outputDirectory` is stored in the subsetted ArchRProject.
+#' Default is `TRUE`.
 #' @param dropCells A boolean indicating whether to drop cells that are not in `ArchRProject` from corresponding Arrow Files.
 #' @param logFile The path to a file to be used for logging ArchR output.
+#' @param showLogo A boolean value indicating whether to show the ascii ArchR logo after successful creation of the subsetted `ArchRProject`.
 #' @param threads The number of threads to use for parallel execution. 
 #' @param force If output directory exists overwrite.
 #' 
@@ -696,8 +736,10 @@ subsetArchRProject <- function(
   ArchRProj = NULL,
   cells = getCellNames(ArchRProj),
   outputDirectory = "ArchRSubset",
+  fullPath = getArchRPathFormat(),
   dropCells = TRUE,
   logFile = NULL,
+  showLogo = TRUE,
   threads = getArchRThreads(),
   force = FALSE
   ){
@@ -705,6 +747,8 @@ subsetArchRProject <- function(
   .validInput(input = ArchRProj, name = "ArchRProj", valid = "ArchRProj")
   .validInput(input = cells, name = "cells", valid = "character")
   .validInput(input = outputDirectory, name = "outputDirectory", valid = "character")
+  .validInput(input = fullPath, name = "fullPath", valid = "boolean")
+  .validInput(input = showLogo, name = "showLogo", valid = "boolean")
 
   outDirOld <- getOutputDirectory(ArchRProj)
 
@@ -721,7 +765,9 @@ subsetArchRProject <- function(
   saveArchRProject(
     ArchRProj = ArchRProj[cells, ], 
     outputDirectory = outputDirectory,
+    fullPath = fullPath,
     load = TRUE,
+    showLogo = showLogo,
     dropCells = dropCells,
     logFile = logFile,
     threads = threads
