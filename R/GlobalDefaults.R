@@ -73,8 +73,8 @@ ArchRDependency <- c(
   
   if(!.isWholenumber(options()[["ArchR.threads"]])){
     addArchRThreads()
-  }else if(options()[["ArchR.threads"]] == 1){
-    addArchRThreads()
+  } else {
+    addArchRThreads(threads = options()[["ArchR.threads"]])
   }
   
   if(!.checkCairo()){
