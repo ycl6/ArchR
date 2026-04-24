@@ -63,7 +63,7 @@ ArchRDependency <- c(
     })
   }
 
-  if(!interactive()) return()
+  if(!interactive() && !.checkJupyter()) return()
 
   #Set Default Options
   op <- options()
