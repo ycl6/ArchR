@@ -6,6 +6,7 @@
 ArchRDefaults <- list(
   ArchR.threads = 1,
   ArchR.preschedule = FALSE, # i.e. mc.preschedule = FALSE
+  ArchR.fullPath = TRUE,
   ArchR.locking = FALSE,
   ArchR.logging = TRUE,
   ArchR.h5level = 0,
