@@ -138,7 +138,12 @@ addGeneExpressionMatrix <- function(
     return(x)
   })
   features <- Reduce("c",features)
-  rowData(seRNA)$idx <- features[rownames(seRNA)]$idx
+  seTMP <- seRNA[names(features),] # re-order genes in seRNA by sorted features
+  if(!identical(rownames(seRNA), rownames(seTMP))) {
+    warning("Genes (rows) in seRNA is re-ordered according to genomic positions.")
+  }
+  seRNA <- seTMP
+  rowData(seRNA)$idx <- features$idx
 
   .logThis(qcInfo, "qcInfo", logFile = logFile)
 
