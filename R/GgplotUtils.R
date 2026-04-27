@@ -1041,10 +1041,8 @@ theme_ArchR <- function(
 #Check Cairo
 .checkCairo <- function(){
   tryCatch({
-    tmp <- dev.cur()
     Cairo::Cairo(type='raster')
     dev.off()
-    dev.set(tmp)
     TRUE
   }, error = function(e){
     FALSE
