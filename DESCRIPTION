@@ -1,19 +1,20 @@
 Package: ArchR
 Type: Package
-Date: 2025-01-19
-Title: Analyzing single-cell regulatory chromatin in R.
-Version: 1.0.3
+Date: 2026-04-27
+Title: Analyzing Single-Cell Regulatory Chromatin in R
+Version: 1.0.3.50
 Authors@R: c(
     person("Jeffrey", "Granja", email = "jgranja.stanford@gmail.com", role = "aut"),
     person("Ryan", "Corces", email = "ryan.corces@gladstone.ucsf.edu", role = c("aut","cre")),
-    person("Paulina","Paiz", role = "aut"),
-    person("Immanuel Abdi", email = "iabdi@stanford.edu", role = c("aut", "ctb")))
-Description: This package is designed to streamline scATAC analyses in R.
+    person("Paulina", "Paiz", role = "aut"),
+    person("Immanuel", "Abdi", email = "iabdi@stanford.edu", role = c("aut", "ctb")),
+    person("I-Hsuan", "Lin", email = "ycl6.gel@gmail.com", role = c("aut", "ctb"), comment = c(ORCID = "0000-0002-6207-1299")))
+Description: Designed to provide streamline scATAC and multiomic analyses in R.
 Roxygen: list(markdown = TRUE)
 License: MIT
 LinkingTo: Rcpp, RcppArmadillo
 LazyData: TRUE
-URL: https://www.ArchRProject.com
+URL: https://github.com/ycl6/ArchR
 RoxygenNote: 7.3.3
 Encoding: UTF-8
 Imports:
@@ -21,6 +22,7 @@ Imports:
     Biostrings,
     chromVAR,
     chromVARmotifs,
+    cli,
     ComplexHeatmap,
     data.table,
     devtools,
@@ -40,7 +42,6 @@ Imports:
     plyr,
     presto,
     Rcpp (>= 0.12.16),
-    RcppArmadillo,
     rhdf5,
     Rsamtools,
     S4Vectors (>= 0.9.25),
