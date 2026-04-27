@@ -44,22 +44,23 @@ ArchRDependency <- c(
   #Allow S3/S4 exports to be larger than 500 mb
   options(future.globals.maxSize = 2097152000)
   
-  #Logo
-  .ArchRLogo()
-  
   #Package Startup
-  v <- packageVersion("ArchR")
-  packageStartupMessage("ArchR : Version ", v, "\nFor more information see our website : www.ArchRProject.com\nIf you encounter a bug please report : https://github.com/GreenleafLab/ArchR/issues")
-  
-  #Load Packages
-  packageStartupMessage("Loading Required Packages...")
+  v_emph = cli::combine_ansi_styles("bold", "red")
+  v_msg = sprintf('{cli::symbol$bullet} This is {cli::style_bold("%s")} {v_emph("devel")} version %s from {.url https://github.com/ycl6/ArchR}',
+		  pkgname, packageVersion(pkgname))
+
+  cli::cli_inform(cli::cli_verbatim(.ArchRLogo(ascii = "Package", messageLogo = FALSE)), class = "packageStartupMessage")
+  cli::cli_inform(v_msg, class = "packageStartupMessage")
+  cli::cli_inform("{cli::symbol$bullet} For more information see the ArchR website: {.href [www.ArchRProject.com](https://www.archrproject.com/)}", class = "packageStartupMessage")
+  cli::cli_inform("{cli::symbol$bullet} If you encounter a bug please report: {.url https://github.com/GreenleafLab/ArchR/issues}", class = "packageStartupMessage")
+
+  #Load Packages, only print failed packages
   pkgs <- ArchRDependency
   for(i in seq_along(pkgs)){
-    packageStartupMessage("\tLoading Package : ", pkgs[i], " v", packageVersion(pkgs[i]))
     tryCatch({
       suppressPackageStartupMessages(require(pkgs[i], character.only=TRUE))
     }, error = function(e){
-      packageStartupMessage("\tFailed To Load Package : ", pkgs[i], " v", packageVersion(pkgs[i]))
+      cli::cli_warn(sprintf("Failed To Load %s v%s", pkgs[i], packageVersion(pkgs[i])), class = "packageStartupMessage")
     })
   }
 
@@ -78,11 +79,11 @@ ArchRDependency <- c(
   }
   
   if(!.checkCairo()){
-    packageStartupMessage("WARNING : Cairo check shows Cairo is not functional.\n          ggplot2 rasterization will not be available without Cario.\n          This may cause issues editing plots with many thousands of points from single cells.")
+    cli::cli_warn("Cairo check shows Cairo is not functional.\n          ggplot2 rasterization will not be available without Cario.\n          This may cause issues editing plots with many thousands of points from single cells.", class = "packageStartupMessage")
   }
   
   if(.checkJupyter()){
-    packageStartupMessage("Detected Jupyer Notebook session. Disabling Log Messages!\n\tIf this is undesired use `addArchRVerbose(TRUE)`")
+    cli::cli_warn("Detected Jupyer Notebook session. Disabling Log Messages!\n\tIf this is undesired use `addArchRVerbose(TRUE)`", class = "packageStartupMessage")
     addArchRVerbose(verbose = FALSE)
   }
   
