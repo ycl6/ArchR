@@ -38,15 +38,15 @@ to sequencing depth that is greater than the \code{corCutOff}, it will be exclud
 \item{name}{The name to store harmony output as a \code{reducedDims} in the \code{ArchRProject} object.}
 
 \item{groupBy}{The name of the column in \code{cellColData} to use for grouping cells together for vars in harmony batch correction.
-The value of \code{groupBy} is passed to the \code{vars_use} parameter in \code{harmony::HarmonyMatrix()}. When run through ArchR, this parameter
-defines which variables to correct for during batch correction. See \code{harmony::HarmonyMatrix()} for more information.}
+The value of \code{groupBy} is passed to the \code{vars_use} parameter in \code{\link[harmony:HarmonyMatrix]{harmony::HarmonyMatrix()}} (harmony v1) or
+\code{\link[harmony:RunHarmony]{harmony::RunHarmony()}} (harmony v2). When run through ArchR, this parameter defines which variables to correct for during batch correction.}
 
 \item{verbose}{A boolean value indicating whether to use verbose output during execution of this function. Can be set to FALSE for a cleaner output.}
 
 \item{force}{A boolean value that indicates whether or not to overwrite data in a given column when the value passed to \code{name} already
 exists as a column name in \code{cellColData}.}
 
-\item{...}{Additional arguments to be provided to harmony::HarmonyMatrix}
+\item{...}{Additional arguments to be provided to \code{harmony::HarmonyMatrix()} or \code{harmony::RunHarmony()}}
 }
 \description{
 This function will add the Harmony batch-corrected reduced dimensions to an ArchRProject.
