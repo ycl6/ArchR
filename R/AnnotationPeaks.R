@@ -371,7 +371,7 @@ addMotifAnnotations <- function(
   ){
 
   if (lifecycle::is_present(motifPWMs)) {
-    lifecycle::deprecate_warn("1.0.3", "addMotifAnnotations(motifPWMs)", "addMotifAnnotations(motifList)")
+    lifecycle::deprecate_warn("1.0.3.50", "addMotifAnnotations(motifPWMs)", "addMotifAnnotations(motifList)")
     motifList <- motifPWMs
   }
 

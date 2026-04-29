@@ -311,7 +311,7 @@ getGroupBW <- function(
   Cells <- ArchRProj$cellNames
 
   if(lifecycle::is_present(groupBy)) {
-    lifecycle::deprecate_warn("1.0.3", "getGroupBW(groupBy)", "getGroupBW(ids)")
+    lifecycle::deprecate_warn("1.0.3.50", "getGroupBW(groupBy)", "getGroupBW(ids)")
     ids <- groupBy
   }
 

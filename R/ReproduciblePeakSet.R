@@ -98,7 +98,7 @@ addReproduciblePeakSet <- function(
   ){
 
   if(lifecycle::is_present(pathToMacs2)) {
-    lifecycle::deprecate_warn("1.0.3", "addReproduciblePeakSet(pathToMacs2)", "addReproduciblePeakSet(pathToMACS)")
+    lifecycle::deprecate_warn("1.0.3.50", "addReproduciblePeakSet(pathToMacs2)", "addReproduciblePeakSet(pathToMACS)")
     pathToMACS <- pathToMacs2
   }
 
@@ -848,7 +848,7 @@ addReproduciblePeakSet <- function(
 #'
 #' @export
 findMacs2 <- function(){
-    lifecycle::deprecate_warn("1.0.3", "findMacs2()", "findMacs()")
+    lifecycle::deprecate_warn("1.0.3.50", "findMacs2()", "findMacs()")
     findMacs(peakMethod = "Macs2")
 }
 
