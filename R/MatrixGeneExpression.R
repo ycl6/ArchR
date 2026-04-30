@@ -76,9 +76,9 @@ addGeneExpressionMatrix <- function(
   seqRNA <- paste0(unique(seqnames(seRNA)))
   if(sum(seqRNA %in% paste0(seqnames(chromSizes))) <= 0.5 * length(seqRNA)){
     if(force){
-      stop(paste0("Detected less than 50% of seqnames for seRNA in chromSizes! Are you sure the seqnames of your seRNA are correct?!"))
+      message("Detected less than 50% of seqnames for seRNA in chromSizes! Continuing since `force = TRUE`!")
     }else{
-      message(paste0("Detected less than 50% of seqnames for seRNA in chromSizes! Continuing since `force` = TRUE!"))
+      stop("Detected less than 50% of seqnames for seRNA in chromSizes! Are you sure the seqnames of your seRNA are correct?! Set `force = TRUE` to disregard and continue.")
     } 
   }
 
