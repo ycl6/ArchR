@@ -487,7 +487,6 @@ createArrowFiles <- function(
     .logDiffTime(sprintf("%s Plotting Fragment Size Distribution", prefix), t1 = tstart, verbose = FALSE, logFile = logFile)
     
     dir.create(QCDir, showWarnings = FALSE)
-    pdf(file.path(QCDir,paste0(sampleName,"-Fragment_Size_Distribution.pdf")),width=4,height=3,onefile=FALSE)
     plotDF <- data.frame(
       x = seq_along(fragSummary[[2]]), 
       percent = 100 * fragSummary[[2]]/sum(fragSummary[[2]])
@@ -498,6 +497,8 @@ createArrowFiles <- function(
           xlab("Size of Fragments (bp) \n") + 
           ylab("Fragments (%)") + 
           ggtitle(paste0(sampleName,"\nnFrags = ", round(sum(Metadata[,2])/10^6, 2)," M\nFragment Size Distribution"))
+
+    pdf(file.path(QCDir,paste0(sampleName,"-Fragment_Size_Distribution.pdf")),width=4,height=3,onefile=FALSE)
     .fixPlotSize(gg, plotWidth = 4.5, plotHeight = 3.5, height = 3/4)
     dev.off()
 
@@ -547,7 +548,6 @@ createArrowFiles <- function(
         paste0("Median TSS Enrichment = ", median(Metadata$TSSEnrichment[Metadata$Keep==1]))
       )
 
-    pdf(file.path(QCDir,paste0(sampleName,"-TSS_by_Unique_Frags.pdf")),width=4,height=4,onefile=FALSE)
     gg <- ggPoint(
       x = pmin(log10(Metadata$nFrags), 5) + rnorm(length(Metadata$nFrags), sd = 0.00001),
       y = Metadata$TSSEnrichment + rnorm(length(Metadata$nFrags), sd = 0.00001), 
@@ -562,6 +562,8 @@ createArrowFiles <- function(
       rastr = TRUE) + 
       geom_hline(yintercept=filterTSS, lty = "dashed", linewidth = 0.25) +
       geom_vline(xintercept=log10(filterFrags), lty = "dashed", linewidth = 0.25)
+
+    pdf(file.path(QCDir,paste0(sampleName,"-TSS_by_Unique_Frags.pdf")),width=4,height=4,onefile=FALSE)
     .fixPlotSize(gg, plotWidth = 4, plotHeight = 4)
     dev.off()
 

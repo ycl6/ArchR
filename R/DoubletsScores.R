@@ -381,9 +381,6 @@ addDoubletScores <- function(
 
   o <- tryCatch({
 
-    #Plot Doublet Summary
-    pdf(file.path(outDir, paste0(.sampleName(ArrowFile), "-Doublet-Summary.pdf")), width = 6, height = 6)
-
     #Plot Doublet Density
     xlim <- range(df$X1) %>% extendrange(f = 0.05)
     ylim <- range(df$X2) %>% extendrange(f = 0.05)
@@ -439,6 +436,9 @@ addDoubletScores <- function(
       ) + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), 
             axis.text.y = element_blank(), axis.ticks.y = element_blank())
 
+
+    #Plot Doublet Summary
+    pdf(file.path(outDir, paste0(.sampleName(ArrowFile), "-Doublet-Summary.pdf")), width = 6, height = 6)
 
     #1. Doublet Enrichment
     .fixPlotSize(penrich, plotWidth = 6, plotHeight = 6)
